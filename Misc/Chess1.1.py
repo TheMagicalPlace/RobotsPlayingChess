@@ -412,11 +412,13 @@ class Chessgame():
             self.current_player = players[i]
             #print(self)
             if self.current_player == 'White':
-                csw = self._current_state_raw
-                e = AlphaBeta().alphabeta(csw, 3, True, -10000000000, 10000000000)
-                self._current_state_raw.update(e)
-                for dict in self.current:
-                    for x in dict.keys(): dict[x] = self._current_state_raw[x]
+                self._king_check_function()
+                if self.is_in_check:
+                    # print('\n-----The ' + self.current_player + 'king is in check!-----\n')
+                    leave = self.move_selector()
+                else:
+                    self.piece_selector()
+                    self.move_selector()
             else:
                 self._king_check_function()
                 if self.is_in_check:
@@ -558,27 +560,30 @@ class AlphaBeta(Chessgame):
         return child_nodes
 
 
-s = Chessgame(False)
-e = AlphaBeta()
-_,g=e.alphabeta(s._current_state_raw, 4,True, -100000, 100000)
-e.get_current_state(g)
-print(e)
-'''
-# testing stuff
-i = 0
-z = []
-timezero = time.time()
-while i < 10000:
-    inittime = time.time()
-    s = Chessgame()
-    z.append(s._play_game_TESTER_ONLY())
-    z.append([x for x, y in s._current_state_raw.items() if y.piece == 'Kng'])
-    del s
-    i += 1
-    runtime = time.time() - inittime
-    totaltime = time.time() - timezero
-    rt = time.gmtime(runtime)
-    print(rt, runtime, totaltime,i)
 
-print(z)
-'''
+import time
+tcount = 0
+wwins = 0
+bwins = 0
+# testing stuff
+initial = time.time()
+for i in range(0,1000):
+    t0 = time.time()
+    test = Chessgame(False)
+    test.Testing = False
+    test.pseudoAI = 'yes'
+    turn,winner = test._play_game_TESTER_ONLY()
+    elapsed = time.time() - t0
+    total = time.time()-initial
+    if winner == 'Black':bwins += 1
+    elif winner == 'White': wwins += 1
+    else: tcount +=1
+    if turn == 150:
+        print('\nIteration: '+str(i)+'\nRun Time - '+'%0.4fs' % (elapsed)+'\nTotal Duration - '+'%0.4fs' % (total)+
+              '\nResult: '+winner+ '\nWhite Wins: '+str(wwins)+'\nBlack Wins: '+str(bwins)+
+             '\nInconclusive: '+str(tcount))
+    else:
+        print('\nIteration: '+str(i) +'\nRun Time - '+'%0.4fs' % (elapsed)+'\nTotal Duration - '+'%0.4fs' % (total)
+              +'\nResult: Player ' + winner + ' Victory'+'\nTurns: '+str(turn)+
+              '\nWhite Wins: ' + str(wwins) + '\nBlack Wins: ' + str(bwins)
+              + '\nInconclusive: ' + str(tcount))
