@@ -24,7 +24,7 @@ for i in range(0,1000):
     t0 = time.time()
     test = Chessgame()
     test.Testing = False
-    turn,winner = test(RandomAI,RandomAI)
+    turn,winner = test(AlphaBeta,RandomAI)
     elapsed = time.time() - t0
     total = time.time()-initial
     if winner == 'Black':bwins += 1

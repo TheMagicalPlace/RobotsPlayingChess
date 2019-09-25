@@ -102,6 +102,7 @@ class Dummy(Piece):
         self.owner = 'None'
         self.piece = "Not a Piece"
         self.value = 0
+        self.rng = randint(1,100)
 
     def __str__(self):
         return ' '

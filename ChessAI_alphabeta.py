@@ -12,8 +12,8 @@ class ChessNode(Chessgame):
         self.value = value
         self.board = board
         self.index = 0
-        self.children = []
-        self.get_current_state(board)
+        self.children = None
+        #self.get_current_state(board)
 
     def __ge__(self, other):
         return self.value >= other
@@ -45,20 +45,23 @@ class ChessNode(Chessgame):
 
 
 class AlphaBeta(ChessTurnABC,Chessgame):
+
+    type = 'alpha-beta'
     opponent = {'Black': 'White', 'White': 'Black'}
-    def __init__(self,player):
+    def __init__(self,player,root):
         super(ChessTurnABC).__init__()
         self.node_value_pairs = {}
         self.player = player
-    def __call__(self, root,depth):
+    def __call__(self,root,depth=3):
+
         self.root_node = ChessNode(depth,root)
         self.alphabeta(self.root_node,depth,True,-100000,100000)
+        self._current_state_raw = max(self.root_node.children).board
         return max(self.root_node.children).board
 
     def child_node_finder(self, node, depth,is_maxing):
 
         self.current_working_node = node
-        self.get_current_state(self.current_working_node)
         child_nodes = []
         moves = defaultdict(list)
         if is_maxing:
@@ -68,8 +71,8 @@ class AlphaBeta(ChessTurnABC,Chessgame):
         for piece in self.current_working_node:
             piece.getpos(self.current_working_node)
             if piece.owner == current_player:
-                if piece.check_if_changed(self.current_working_node):
-                    [moves[piece].append(x) for x in [*piece.avalible_moves.keys()]]
+                piece.move_range(self.current_working_node)
+                [moves[piece].append(x) for x in [*piece.avalible_moves.keys()]]
 
         for piece, moves in moves.items():
             self.current_piece = piece
@@ -77,21 +80,19 @@ class AlphaBeta(ChessTurnABC,Chessgame):
                 workingboard = copy.copy(self.current_working_node.board)
                 workingboard[piece.position],workingboard[move] = Dummy(),piece
                 child_nodes.append(ChessNode(depth,workingboard,parent=node))
-                child_nodes[-1].parent.children.append(child_nodes[-1])
-        return child_nodes
+        return tuple(child_nodes)
 
     def node_evaluation_heuristic(self, node):
         value = 0
-        for _,piece in node.items():
+        for piece in node:
             if piece.owner == self.player:
+                value += piece.value
                 if piece.move_range(node) != []:
-                    value += len([*piece.avalible_moves.keys()])
+                    value += len([*piece.avalible_moves.keys()])*0.1
             if piece.owner == self.opponent[self.player]:
+                value -= piece.value
                 if piece.move_range(node) != []:
-                    value -= len([*piece.avalible_moves.keys()])
-        value = value//10
-        for _, piece in node.items():
-            value += piece.value if piece.owner == self.player else -piece.value
+                    value -= len([*piece.avalible_moves.keys()])*0.1
         return value
 
     def alphabeta(self, node, depth, maxing_player, alpha, beta):
@@ -99,7 +100,7 @@ class AlphaBeta(ChessTurnABC,Chessgame):
 
         if depth == 0:
             value = self.node_evaluation_heuristic(node)
-            node.parent.children.append(ChessNode(0,node.board,value=value))
+            node.value = value
             return value
 
         if maxing_player:
@@ -115,7 +116,7 @@ class AlphaBeta(ChessTurnABC,Chessgame):
                 except TypeError:
                     value = max(value, val[0])
                 alpha = max(alpha, value)
-                nodes.value = value
+                node.value = value
                 if alpha >= beta:
                     break
                 else:
@@ -129,7 +130,7 @@ class AlphaBeta(ChessTurnABC,Chessgame):
                 val = self.alphabeta(nodes, depth - 1, True, alpha, beta)
                 value = min(value, val)
                 beta = min(beta, value)
-                nodes.value = value
+                node.value = value
                 if alpha >= beta:
                     break
                 else: continue
@@ -141,5 +142,5 @@ if __name__ == '__main__':
 
     t = Chessgame()
     a = AlphaBeta('White')
-    a(t._current_state_raw,5)
+    a(t._current_state_raw,2)
     print(a)

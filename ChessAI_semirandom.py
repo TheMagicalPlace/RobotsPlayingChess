@@ -3,7 +3,7 @@ import logging
 from ChessPieces import *
 from Player_Base import *
 class RandomAI(ChessTurnABC):
-
+    type = 'semi-random'
     def __init__(self,player,board):
         super().__init__(player,board)
         self.testing_holdback = []

@@ -3,7 +3,8 @@ from Player_Base import *
 import copy
 import random as r
 from abc import abstractclassmethod
-
+from Visualization import *
+from time import sleep
 from ChessPieces import *
 from colorama import Fore, Back, Style
 
@@ -27,6 +28,32 @@ class Chessgame:
         self.turn_count = 0
         self.testing_holdback = []
 
+    def determine_checkmate(self,player):
+        king_check = defaultdict(list)
+        for k, v in self._current_state_raw.items():
+            if v.owner == player:
+                king_check[self.opponent[player]] += v.move_range(self._current_state_raw, True)
+            if v.owner == self.opponent[player] and v.piece == 'Kng':
+                king_pos, king = k, v
+        try:
+            king.move_range(self._current_state_raw)
+        except UnboundLocalError:
+            print((f'{self.opponent[player]} is in checkmate'))
+            return -1
+        else:
+            king_move_range = list(king.avalible_moves.keys())
+            king_move_range.append(king_pos)
+            kmr = set(king_move_range)
+            kcr = set(king_check[self.opponent[player]])
+            if not kmr.issubset(kcr):
+                print(kmr-kcr)
+                if king_pos in kcr:
+                    print(f'{self.opponent[player]} is in check')
+                else:
+                    print(f'{self.opponent[player]} is not in checkmate or check')
+            else:
+                print((f'{self.opponent[player]} is in checkmate'))
+                return -1
 
     def _setup(self):
         '''
@@ -58,6 +85,7 @@ class Chessgame:
                 tracker = {}
             [v.getpos(self._current_state_raw) for k, v in self._current_state_raw.items()]
         self.get_current_state(self._current_state_raw)
+        #self.Visual = BoardRepresentation(self._current_state_raw)
 
     def get_current_state(self, raw_state):
 
@@ -84,20 +112,28 @@ class Chessgame:
             if current_player == 'White':
                 if AI1 is not None:
                     leave = white_ai(self._current_state_raw)
+                    if white_ai.type =='alpha-beta': leave = None
                     self._current_state_raw = white_ai._current_state_raw
                     self.get_current_state(self._current_state_raw)
+                    leave = self.determine_checkmate(current_player)
                 else:
                     pass
             else:
                 if AI2 is not None:
                     leave = black_ai(self._current_state_raw)
+                    if black_ai.type == 'alpha-beta': leave = None
                     self._current_state_raw = black_ai._current_state_raw
                     self.get_current_state(self._current_state_raw)
+                    leave = self.determine_checkmate(current_player)
                 else:
                     pass
+            #self.Visual(self._current_state_raw)
+
+
             self.testing_holdback.append([copy.copy(self.current),copy.deepcopy(self._current_state_raw),
                                           black_ai.current_piece if current_player=='Black' else white_ai.current_piece])
-            current_player = Chessgame.opponent[current_player]
+
+            if leave is None: current_player = Chessgame.opponent[current_player]
             turn += 1
             if turn == 100:
                 leave = -5
@@ -115,7 +151,7 @@ class Chessgame:
                 print(self)
                 self.current_piece = self.testing_holdback[i][2]
                 print(self.__str__(True, self.testing_holdback[i][2].avalible_moves.keys()))
-            return  ['null','null']
+            return  [turn,current_player]
 
 
     def __str__(self, showmoves=False, moves=[]):
