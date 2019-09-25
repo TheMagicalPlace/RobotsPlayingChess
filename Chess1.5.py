@@ -9,7 +9,9 @@
 
 import time
 import functools
-
+from ChessAI_semirandom import *
+from ChessAI_alphabeta import  *
+from ChessBoard import *
 bwins = 0
 smts = 0
 tcount = 0
@@ -20,10 +22,9 @@ initial = time.time()
 for i in range(0,1000):
 
     t0 = time.time()
-    test = Chessgame(False)
+    test = Chessgame()
     test.Testing = False
-    test.pseudoAI = 'yes'
-    turn,winner = test()
+    turn,winner = test(RandomAI,RandomAI)
     elapsed = time.time() - t0
     total = time.time()-initial
     if winner == 'Black':bwins += 1

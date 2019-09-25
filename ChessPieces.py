@@ -1,3 +1,5 @@
+from random import randint
+
 class Piece():
     ''' Each subclass of the piece object has it\'s own function for checking the movment range against the
 imputted move. Currently the way most of them work is by testing every appicable string combination for a given piece
@@ -10,13 +12,18 @@ imputted move. Currently the way most of them work is by testing every appicable
         self.owner = playerID
         self.piece = 'Undef'
         self.value = 0
-        self.avalible_moves = False
+        self.avalible_moves = {}
         self.kc_moves = {}
-
+        self.position_history = []
+        self.rng = randint(1,1000)
     def __eq__(self, other):
         return self.piece == other
 
+    def __hash__(self):
+        return hash((self.owner,self.piece,self.rng))
+
     def check_if_changed(self, current_board, is_king_check=False):
+        self.move_range(current_board,is_king_check)
         if not self.avalible_moves:
             self.move_range(current_board, is_king_check)
             return [*self.avalible_moves.keys()]
@@ -33,8 +40,7 @@ imputted move. Currently the way most of them work is by testing every appicable
         return self.piece + ' '  # self.owner + self.piece
 
     def getpos(self, current_state_raw):
-        self.position = "".join([k for k, v in current_state_raw.items() if self == current_state_raw[k]])
-
+        self.position = "".join([k for k, v in current_state_raw.items() if self is current_state_raw[k]])
     def move_range(self, current_state_raw, is_king_check=False):
         up_right, up_left, down_right, down_left, up, down, left, right = \
             self.position, self.position, self.position, self.position, self.position, self.position, self.position, self.position

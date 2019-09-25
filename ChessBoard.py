@@ -3,7 +3,8 @@ from Player_Base import *
 import copy
 import random as r
 from abc import abstractclassmethod
-from ChessAI_alphabeta import *
+
+from ChessPieces import *
 from colorama import Fore, Back, Style
 
 
@@ -20,11 +21,12 @@ class Chessgame:
         self._current_state_raw = {}
         self.is_in_check = False
         self.testvalue = None
-        self.Testing = False
-        self.testing_holdback=[]
+
         self._setup()
         self.king_check = {'Black': [], 'White': []}
         self.turn_count = 0
+        self.testing_holdback = []
+
 
     def _setup(self):
         '''
@@ -78,19 +80,23 @@ class Chessgame:
         opponent = {'Black':'White','White':'Black'}
         current_player = 'White'
         while leave is None:
-            print(current_player+'\'s Turn!')
+            #print(current_player+'\'s Turn!')
             if current_player == 'White':
                 if AI1 is not None:
-                    self._current_state_raw = white_ai(self._current_state_raw)
+                    leave = white_ai(self._current_state_raw)
+                    self._current_state_raw = white_ai._current_state_raw
                     self.get_current_state(self._current_state_raw)
                 else:
                     pass
             else:
                 if AI2 is not None:
-                    self._current_state_raw = black_ai(self._current_state_raw)
+                    leave = black_ai(self._current_state_raw)
+                    self._current_state_raw = black_ai._current_state_raw
                     self.get_current_state(self._current_state_raw)
                 else:
                     pass
+            self.testing_holdback.append([copy.copy(self.current),copy.deepcopy(self._current_state_raw),
+                                          black_ai.current_piece if current_player=='Black' else white_ai.current_piece])
             current_player = Chessgame.opponent[current_player]
             turn += 1
             if turn == 100:
@@ -98,19 +104,19 @@ class Chessgame:
             else:
                 turn +=1
 
-        if len(self.testing_holdback) > 500:
-            for i in range(-1, -5, -1):
-                self.current = self.testing_holdback[i][0]
-                print(self.testing_holdback[i][2].owner)
-                print(self)
-                print(self.__str__(True, self.testing_holdback[i][1]))
-                self.current_piece = self.testing_holdback[i][2]
-                print(self.__str__(True, self.testing_holdback[i][2].avalible_moves.keys()))
         if leave == -1:
             return(turn,current_player)
         elif leave == -10:
             return(turn,'Stalemate')
         elif leave ==-5: return(turn,'Maximum Turns Reached')
+        elif leave == -999:
+            for i in range(-1, -6, -1):
+                self.current = self.testing_holdback[i][0]
+                print(self)
+                self.current_piece = self.testing_holdback[i][2]
+                print(self.__str__(True, self.testing_holdback[i][2].avalible_moves.keys()))
+            return  ['null','null']
+
 
     def __str__(self, showmoves=False, moves=[]):
 
