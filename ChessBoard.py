@@ -7,7 +7,7 @@ from Visualization import *
 from time import sleep
 from ChessPieces import *
 from colorama import Fore, Back, Style
-
+import time
 
 class Chessgame:
     Names = ['Rook', 'Knight', 'Bishop',
@@ -111,7 +111,8 @@ class Chessgame:
             #print(current_player+'\'s Turn!')
             if current_player == 'White':
                 if AI1 is not None:
-                    leave = white_ai(self._current_state_raw)
+                    leave = white_ai()
+                    time.sleep(10)
                     if white_ai.type =='alpha-beta': leave = None
                     self._current_state_raw = white_ai._current_state_raw
                     self.get_current_state(self._current_state_raw)

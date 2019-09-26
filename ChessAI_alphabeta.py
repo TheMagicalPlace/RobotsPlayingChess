@@ -3,6 +3,18 @@ from collections import defaultdict
 from ChessBoard import Chessgame
 from Player_Base import *
 from ChessPieces import *
+from multiprocessing import Queue,Pool
+from queue import Queue
+
+
+class vars:
+    player = 'White'
+    depth = 3
+
+def child_process(node,player=vars.player):
+    abspawn = AlphaBeta(player)
+    return abspawn.call_multiprocess(node,maxing=False)
+
 
 class ChessNode(Chessgame):
 
@@ -48,16 +60,25 @@ class AlphaBeta(ChessTurnABC,Chessgame):
 
     type = 'alpha-beta'
     opponent = {'Black': 'White', 'White': 'Black'}
-    def __init__(self,player,root):
+    def __init__(self,player):
         super(ChessTurnABC).__init__()
-        self.node_value_pairs = {}
         self.player = player
-    def __call__(self,root,depth=3):
+
+
+    def call_multiprocess(self,node,maxing):
+        depth = node.depth - 1
+        self.root_node = node
+        self.alphabeta(self.root_node, depth, maxing, -100000, 100000)
+        optimal_node = max([child for child in self.root_node.children if child.value is not None])
+        return optimal_node.parent
+
+
+    def __call__(self,root,depth=3,maxing=True):
 
         self.root_node = ChessNode(depth,root)
-        self.alphabeta(self.root_node,depth,True,-100000,100000)
-        self._current_state_raw = max(self.root_node.children).board
-        return max(self.root_node.children).board
+        self.alphabeta(self.root_node,depth,maxing,-100000,100000)
+        self._current_state_raw = max([child for child in self.root_node.children if child.value is not None]).board
+        return self._current_state_raw
 
     def child_node_finder(self, node, depth,is_maxing):
 
@@ -105,11 +126,9 @@ class AlphaBeta(ChessTurnABC,Chessgame):
 
         if maxing_player:
             value = -100000
-
             subnodes = self.child_node_finder(node,depth,maxing_player)
             node.children = subnodes
             for nodes in subnodes:
-                #self.branch[depth].append(self.alphabeta(nodes, depth - 1, False, alpha, beta))
                 val = self.alphabeta(nodes, depth - 1, False, alpha, beta)
                 try:
                     value = max(value,val)
@@ -125,8 +144,8 @@ class AlphaBeta(ChessTurnABC,Chessgame):
         else:
             value = 100000
             subnodes = self.child_node_finder(node, depth,maxing_player)
+            node.children = subnodes
             for nodes in subnodes:
-                #self.branch[depth].append(self.alphabeta(nodes, depth - 1, True, alpha, beta))
                 val = self.alphabeta(nodes, depth - 1, True, alpha, beta)
                 value = min(value, val)
                 beta = min(beta, value)
@@ -137,10 +156,36 @@ class AlphaBeta(ChessTurnABC,Chessgame):
             return value
 
 
-if __name__ == '__main__':
 
+
+
+class MultiprocessAB(AlphaBeta):
+
+    def __init__(self, player, root,depth=4):
+        super().__init__(player)
+
+        self.root_node = ChessNode(depth,root)
+        self.mp_childs = self.child_node_finder(self.root_node,depth-1,True)
+        self.root_node.children = tuple(self.mp_childs)
+
+
+    def __call__(self):
+
+        with Pool(5) as p:
+            data = p.map(child_process, self.mp_childs)
+        self._current_state_raw=max(data)
+
+
+if __name__ == '__main__':
+    import time
 
     t = Chessgame()
-    a = AlphaBeta('White')
-    a(t._current_state_raw,2)
-    print(a)
+    initial = time.time()
+    for i in range(5,6):
+        t0  = time.time()
+        a = MultiprocessAB('Black',t._current_state_raw,depth=i)
+        yepis = a()
+        yepis.get_current_state(yepis.board)
+        elapsed = time.time() - t0
+        total = time.time()-initial
+        print(f'depth: {i} run-time: {elapsed} total time : {total}')
