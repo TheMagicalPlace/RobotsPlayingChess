@@ -1,9 +1,10 @@
-
+"""Note: This is not finished and does not currently work"""
 from collections import defaultdict
 from matplotlib import pyplot as plt
 import numpy as np
-class BoardRepresentation:
 
+class BoardRepresentation:
+    """Live representation of the game using matplotlib"""
     def __init__(self,raw_data):
         self.plt = plt
         self.plt.ion()
@@ -24,7 +25,7 @@ class BoardRepresentation:
         self.plt.pause(0.001)
 
     def converter(self,raw_data):
-
+        """Converts the raw board data into plot stuff"""
 
         conversion = {j:i-0.5 for i,j in enumerate('abcdefgh')}
 

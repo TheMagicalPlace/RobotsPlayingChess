@@ -3,7 +3,7 @@ from abc import abstractmethod
 from collections import defaultdict
 from colorama import Fore, Back, Style
 class ChessTurnABC():
-
+    """Base Class for AI"""
     def __init__(self,player,working_board):
         self.current_player = player
         self._current_state_raw = working_board
@@ -20,6 +20,7 @@ class ChessTurnABC():
         pass
 
     def _king_check_function(self):
+        """checks if player is in check"""
         self.king_check = defaultdict(list)
         for k, v in self._current_state_raw.items():
             if v.owner != self.current_player and v.owner in ['Black', 'White']:

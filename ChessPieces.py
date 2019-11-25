@@ -16,6 +16,8 @@ imputted move. Currently the way most of them work is by testing every appicable
         self.kc_moves = {}
         self.position_history = []
         self.rng = randint(1,1000)
+
+
     def __eq__(self, other):
         return self.piece == other
 
@@ -23,7 +25,11 @@ imputted move. Currently the way most of them work is by testing every appicable
         return hash((self.owner,self.piece,self.rng))
 
     def check_if_changed(self, current_board, is_king_check=False):
+        """checks if the pieces move range has changed since the last check by checking if the spaces of the prev.
+        moves have the same piece as before"""
         self.move_range(current_board,is_king_check)
+
+        # checks for moves if none were found last time
         if not self.avalible_moves:
             self.move_range(current_board, is_king_check)
             return [*self.avalible_moves.keys()]
@@ -40,8 +46,12 @@ imputted move. Currently the way most of them work is by testing every appicable
         return self.piece + ' '  # self.owner + self.piece
 
     def getpos(self, current_state_raw):
+        """Updates the board position of the piece"""
         self.position = "".join([k for k, v in current_state_raw.items() if self is current_state_raw[k]])
+
     def move_range(self, current_state_raw, is_king_check=False):
+        """finds avalible moves based on what piece it is, knights and pawns have their own move rules in their \
+        respective classes"""
         up_right, up_left, down_right, down_left, up, down, left, right = \
             self.position, self.position, self.position, self.position, self.position, self.position, self.position, self.position
         if self.piece == 'Twr':
@@ -50,6 +60,8 @@ imputted move. Currently the way most of them work is by testing every appicable
             up, down, left, right = -1, -1, -1, -1
         moves = []
         for i in range(1, 8):
+
+            # -1 is used to indicate that the last checked spot is the furthest move in that direction
             if up_left == up_right == down_left == down_right == up == down == left == right == -1: break
             up_right = (chr(ord(self.position[0]) + i) + str(int(self.position[1]) + i)) if up_right != -1 else -1
             up_left = (chr(ord(self.position[0]) - i) + str(int(self.position[1]) - i)) if up_left != -1 else -1
@@ -59,15 +71,21 @@ imputted move. Currently the way most of them work is by testing every appicable
             down = (chr(ord(self.position[0]) - i) + str(int(self.position[1]))) if down != -1 else -1
             left = (chr(ord(self.position[0])) + str(int(self.position[1]) - i)) if left != -1 else -1
             right = (chr(ord(self.position[0])) + str(int(self.position[1]) + i)) if right != -1 else -1
+
+            #
             next = [str(up_right), str(up_left), str(down_right),
                     str(down_left), str(up), str(down), str(left), str(right)]
             pots = [x for x in next if x[0] in 'abcdefgh' and x[1] in '12345678']
+
+            # all moves are looked at when a king is in check
             if is_king_check:
                 pots = [x for x in pots]
             else:
                 pots = [x for x in pots if (current_state_raw[x]).owner != self.owner]
             for x in pots:
+                # accounts for opposing pieces as an avalible move & blocker
                 if (current_state_raw[x]).owner == self.opponent[self.owner]:
+                    #kings can only move one space
                     if is_king_check:
                         if (current_state_raw[x]).piece == 'Kng':
                             moves.append(x)
@@ -75,6 +93,8 @@ imputted move. Currently the way most of them work is by testing every appicable
                         moves.append(x)
                         pots.remove(x)
             [moves.append(x) for x in pots]
+
+            #checking next spaces
             for x in next:
                 if is_king_check:
                     next[next.index(x)] = -1 if x not in pots else -1 \
@@ -112,9 +132,10 @@ class Pawn(Piece):
     def __init__(self, playerID):
         super().__init__(playerID)
         self.piece = 'Pwn'
-        self.value = 1
+        self.value = 1 # heuristic val for AI
 
     def move_range(self, current_state_raw, is_king_check=False):
+        """Pawns have special move rules"""
         foreward = []
         if self.owner == 'Black':
             foreward = [chr(ord(self.position[0]) - 1) + self.position[1]]
@@ -135,6 +156,7 @@ class Pawn(Piece):
             [foreward.append(x) for x in potatck if x[0] in 'abcdefgh' and x[1] in '12345678' and
              (current_state_raw[x]).owner == 'Black']
         if is_king_check:
+            # pawns can only  attackdiagonallyy
             return [move for move in potatck
                     if move[0] in 'abcdefgh' and move[1] in '12345678']
         else:
@@ -163,6 +185,7 @@ class Knight(Piece):
         self.value = 3
 
     def move_range(self, current_state_raw, *args):
+        # knights have special move rules
         potmoves = \
             [chr(ord(self.position[0]) + 2) + str(int(self.position[1]) - 1),
              chr(ord(self.position[0]) + 2) + str(int(self.position[1]) + 1),
@@ -189,4 +212,4 @@ class King(Piece):
     def __init__(self, playerID):
         super().__init__(playerID)
         self.piece = 'Kng'
-        self.value = 10000
+        self.value = 100000 # functionally infinite

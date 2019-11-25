@@ -3,10 +3,13 @@ import logging
 from ChessPieces import *
 from Player_Base import *
 class RandomAI(ChessTurnABC):
+    """an 'AI' setting that semi-randomly selects a move, with a preference for moves that result in capturing
+    an opponents piece"""
     type = 'semi-random'
     def __init__(self,player,board):
         super().__init__(player,board)
         self.testing_holdback = []
+
     def __call__(self,board):
         self._current_state_raw = board
         end_state = self.move_selector()
@@ -15,12 +18,16 @@ class RandomAI(ChessTurnABC):
 
 
     def piece_selector(self):
+        """randomlly selects what piece to move"""
         choices = [pos for pos, piece in self._current_state_raw.items() if piece.owner == self.current_player]
         select = choices[r.randint(0, len(choices) - 1)]
         self.current_piece = self._current_state_raw[select]
 
     def get_potential_moves(self,board_state,potential_moves = None):
+        """finds the moves avalible"""
         hold = 0
+
+        # if in check AI must always try and move king to safety
         if self.is_in_check:
             self.current_piece = self.king
             potential_moves = [move for move in self.current_piece.check_if_changed(board_state)
@@ -39,6 +46,7 @@ class RandomAI(ChessTurnABC):
                     potential_moves = [move for move in potential_moves if
                                        move not in self.king_check[self.current_player]]
                     hold += 1
+                # not in check but no moves avalible
                 if hold == 20:
                     # print('The game is a Stalemate!')
                     return -10
@@ -46,6 +54,8 @@ class RandomAI(ChessTurnABC):
                 return potential_moves
 
     def _ai_move_select(self,potential_moves):
+        """move selector for AI"""
+
 
         for move in potential_moves:
             dummy = copy.deepcopy(self.current_piece)
@@ -54,6 +64,8 @@ class RandomAI(ChessTurnABC):
             dummyboard = copy.copy(self._current_state_raw)
             dummyboard[move] = dummy
             futuremoves = dummy.check_if_changed(dummyboard)
+
+
             for moves in futuremoves:
                 if moves in self.king_check[Chessgame.opponent[self.current_player]]:
                     if self._current_state_raw[move].owner == self.current_player:
@@ -74,6 +86,7 @@ class RandomAI(ChessTurnABC):
         return potential_moves[-1]
 
     def _board_logger(self,move):
+        """For debugging only, replays last five moves and prints a visualization """
         if self.current_piece != 'Kng' and self.Testing:
             try:
                 assert self._current_state_raw[move].piece != 'Kng'
@@ -93,24 +106,28 @@ class RandomAI(ChessTurnABC):
                 [self.current, self.king_check[self.current_player], copy.deepcopy(self.current_piece)])
 
     def move_selector(self):
+        """"""
 
+        # making sure there are still two kings for debugging purposes
         try:
             assert len([piece for pos, piece in self._current_state_raw.items() if piece.piece == 'Kng']) == 2
         except AssertionError:
             return -999
-        self._king_check_function()
+        self._king_check_function() # checking if in check
         last_state = copy.copy(self._current_state_raw)
         potential_moves = self.get_potential_moves(self._current_state_raw)
-        if isinstance(potential_moves,str): return potential_moves
+        if isinstance(potential_moves,str): return potential_moves # this should never do anything
+
+        # propagating terminal game state up
         if potential_moves == -1:
             return - 1
         elif potential_moves == -10:
             return -10
 
         move = self._ai_move_select(potential_moves)
-        # propogate_exception = self._board_logger(move)
-        # if propogate_exception: return propogate_exception
 
+
+        # checks for upgrade for pawn
         if (self.current_piece).piece == 'Pwn' and move[0] in 'ah':
             temp = self.current_piece.position
             self.current_piece = Queen(self.current_player)
@@ -122,6 +139,8 @@ class RandomAI(ChessTurnABC):
         self._current_state_raw[temp] = Dummy()
 
         self._king_check_function()
+
+        # AI can't make moves that result in it going into check
         if self.is_in_check:
             self._current_state_raw = copy.copy(last_state)
             self.move_selector()

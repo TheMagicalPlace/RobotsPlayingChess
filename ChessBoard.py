@@ -29,6 +29,7 @@ class Chessgame:
         self.testing_holdback = []
 
     def determine_checkmate(self,player):
+        """checking if the player is in checkmate"""
         king_check = defaultdict(list)
         for k, v in self._current_state_raw.items():
             if v.owner == player:
@@ -88,7 +89,7 @@ class Chessgame:
         #self.Visual = BoardRepresentation(self._current_state_raw)
 
     def get_current_state(self, raw_state):
-
+        """gets the formatted version of the board"""
         k, v = [k for k, v in raw_state.items()], [v for k, v in raw_state.items()]
         self.current = []
         row = {}
@@ -99,6 +100,7 @@ class Chessgame:
                 row = {}
 
     def __call__(self, AI1:ChessTurnABC=None,AI2:ChessTurnABC=None):
+        """instances the AI's and runs the game"""
         if AI1 is not None:
             white_ai=AI1('White',self._current_state_raw)
         if AI2 is not None:
@@ -106,13 +108,12 @@ class Chessgame:
         turn = 1
         leave = None
         opponent = {'Black':'White','White':'Black'}
-        current_player = 'White'
+        current_player = 'White' # white moves first
         while leave is None:
             print(current_player+'\'s Turn!')
             if current_player == 'White':
                 if AI1 is not None:
                     leave = white_ai()
-                    time.sleep(10)
                     if white_ai.type =='alpha-beta': leave = None
                     self._current_state_raw = white_ai._current_state_raw
                     self.get_current_state(self._current_state_raw)
