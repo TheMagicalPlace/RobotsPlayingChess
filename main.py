@@ -27,7 +27,7 @@ if __name__ == '__main__':
         t0 = time.time()
         game = Chessgame() # creates a new game
         game.Testing = False
-        turn,winner = game(MultiprocessAB,RandomAI) # returns the round turn count and winner
+        turn,winner = game(RandomAI,MultiprocessAB) # returns the round turn count and winner
         elapsed = time.time() - t0 # round time
         total = time.time()-initial # total process time
         if winner == 'Black':bwins += 1

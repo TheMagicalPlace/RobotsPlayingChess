@@ -113,7 +113,8 @@ class Chessgame:
             print(current_player+'\'s Turn!')
             if current_player == 'White':
                 if AI1 is not None:
-                    leave = white_ai()
+                    white_ai = AI1('White',self._current_state_raw)
+                    leave = white_ai(self._current_state_raw)
                     if white_ai.type =='alpha-beta': leave = None
                     self._current_state_raw = white_ai._current_state_raw
                     self.get_current_state(self._current_state_raw)
@@ -122,7 +123,8 @@ class Chessgame:
                     pass
             else:
                 if AI2 is not None:
-                    leave = black_ai(self._current_state_raw)
+                    black_ai = AI2('Black',self._current_state_raw)
+                    leave = black_ai()
                     if black_ai.type == 'alpha-beta': leave = None
                     self._current_state_raw = black_ai._current_state_raw
                     self.get_current_state(self._current_state_raw)
@@ -130,7 +132,7 @@ class Chessgame:
                 else:
                     pass
             #self.Visual(self._current_state_raw)
-            print(self)
+            #print(self)
 
             self.testing_holdback.append([copy.copy(self.current),copy.deepcopy(self._current_state_raw),
                                           black_ai.current_piece if current_player=='Black' else white_ai.current_piece])

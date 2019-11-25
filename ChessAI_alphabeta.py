@@ -16,7 +16,6 @@ def child_process(node,player,depth):
     """Spawns an instance of the AlphaBeta class with depth of vars.depth for the node given to it, with
     the nodes themselves being created in MultiprocessAB"""
     abspawn = AlphaBeta(player)
-    print('Done!')
     return abspawn.call_multiprocess(node,maxing=False,depth=depth)
 
 
