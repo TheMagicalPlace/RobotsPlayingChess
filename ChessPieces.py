@@ -120,7 +120,7 @@ class Dummy(Piece):
 
     def __init__(self):
         self.owner = 'None'
-        self.piece = "Not a Piece"
+        self.piece = "na"
         self.value = 0
         self.rng = randint(1,100)
 

@@ -19,6 +19,7 @@
 
 
 namespace ChessPieces {
+
     class Piece {
 
     public:
@@ -26,60 +27,79 @@ namespace ChessPieces {
         std::string position;
         explicit Piece(std::string owner);
         int show_rng_value(){ return rng_val;};
-        std::vector<std::string> move_range(std::map<std::string, Piece> current_state, bool is_king_check);
+        std::vector<std::string> move_range(std::map<std::string, Piece *> current_state, bool is_king_check);
         void update_positions(std::map<std::string, Piece> current_state);
+        int get_rng_val();
+        std::string get_piece(){ return piece;}
 
     private:
-        int rng_val;
-        const std::string piece{"Not a Piece"};
+        std::string piece {"na"};
+        int rng_val = get_rng_val();
         static constexpr int value{0};
-        int get_rng_val();
+
     };
 
 
     class Pawn: public Piece{
     public:
-        std::vector<std::string> move_range(std::map<std::string, Piece> current_state, bool is_king_check);
+
+        explicit Pawn(std::string owner);
+
+        std::vector<std::string> move_range(std::map<std::string, Piece *> current_state, bool is_king_check);
     private:
         static constexpr int value{1};
-        const std::string piece{"Pwn"};
+        std::string piece;
     };
 
     class Rook: public Piece{
+    public:
+        explicit Rook(std::string owner);
+
     private:
+        const std::string piece;
         static constexpr int value{5};
-        const std::string piece{"Twr"};
+
     };
 
     class Bishop: public Piece{
+    public:
+        explicit Bishop(std::string owner);
+        const std::string piece{"Bsp"};
     private:
         static constexpr int value{3};
-        const std::string piece{"Bsp"};
+
     };
 
     class Queen: public Piece{
+    public:
+        explicit Queen(std::string owner);
+        const std::string piece{"Qun"};
     private:
         static constexpr int value{8};
-        const std::string piece{"Qun"};
+
     };
 
     class Knight: public Piece{
     public:
-        std::vector<std::string> move_range(std::map<std::string, Piece> current_state, bool is_king_check);
+        explicit Knight(std::string owner);
+        std::vector<std::string> move_range(std::map<std::string, Piece *> current_state, bool is_king_check);
+        const std::string piece{"Twr"};
     private:
         static constexpr int value{5};
-        const std::string piece{"Twr"};
+
     };
 
     class King: public Piece{
     public:
-        std::vector<std::string> move_range(std::map<std::string, Piece> current_state, bool is_king_check);
+        explicit King(std::string owner);
+        std::vector<std::string> move_range(std::map<std::string, Piece *> current_state, bool is_king_check);
         bool is_in_check{false};
         std::vector<std::string> king_check;
+        const std::string piece{"Kng"};
 
     private:
         static constexpr int value{1000000};
-        const std::string piece{"Kng"};
+
     };
 
 }

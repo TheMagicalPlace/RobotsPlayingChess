@@ -1,59 +1,23 @@
+#define PY_SSIZE_T_CLEAN
+#include "/usr/include/python3.7/Python.h"
 #include <iostream>
+#include <algorithm>
+#include <fstream>
 #include "ChessPieces.h"
-
+#include "Setup.h"
+using namespace std;
 void test1();
-
-class Piece {
-    public:
-        const int i{0};
-        void test();
-        Piece();
-        Piece(int value);
-        int get_value();
-        std::string get_piece();
-
-    private:
-        const int value;
-        std::string pce;
-
-
-};
-
-
-Piece::Piece(int value)
-: value(value), pce("noll") {
-    value = value ;
-
-
-};
-
-Piece::Piece()
-: value{1}{
-    pce = "ye";
-}
-
-void Piece::test(){
-    std::cout << "yeet";
-}
-
-int Piece::get_value(){
-    return value;
-}
-
-std::string Piece::get_piece(){
-    return pce;
-}
-
-
 
 int main() {
     ChessPieces::Piece ppp = ChessPieces::Piece("White");
     ChessPieces::Piece pep = ChessPieces::Piece("Black");
-    Piece p = Piece(int{5});
-    Piece p2 = Piece();
-    std::cout << p.get_value() << p.get_piece() <<p2.get_piece() << ppp.show_rng_value() <<pep.show_rng_value();
-    p.test();
-    test1();
+    string a{""};
+
+    string line = { " " };
+    ifstream file1;
+    file1.open("/home/themagicalplace/CLionProjects/RobotsPlayingChess/text1.txt");
+
+    Setup s {};
 };
 
 
