@@ -14,6 +14,7 @@
 ChessPieces::Piece::Piece(std::string owner,std::string position,std::string piece)
     :owner(owner),piece(piece),position(position) {
     rng_val = get_rng_val();
+    value = ChessPieces::pieces.piece_values[piece];
 }
 
 int ChessPieces::Piece::get_rng_val() {
@@ -31,7 +32,7 @@ std::vector<std::string> ChessPieces::Piece::move_range(std::map<std::string, Pi
     }
     const std::string letters{"abcdefghABCDEFGH"};
     const std::string numbers{"12345678"};
-
+    moves.clear();      // clears out move vector upon new move search;
 
     // Setting up individual directions to check in
     std::string up_right{position};
@@ -238,6 +239,15 @@ std::vector<std::string> ChessPieces::Piece::move_range_knight(std::map<std::str
 
 void ChessPieces::Piece::update_positions(std::map<std::string, Piece> current_state) {
     rng_val = get_rng_val();
+}
+
+std::string ChessPieces::Piece::get_position(std::map<std::string, Piece *> &current_state) {
+    for (auto &space :current_state)
+    {
+        if (space.second == this)
+            return space.first;
+    }
+    return "not found";
 }
 
 
