@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.15)
-project(proj1)
+project(RobotsPlayingChess)
 
 set(CMAKE_CXX_STANDARD 14)
 
-add_executable(proj1 main.cpp "ChessPieces.cpp" "ChessPieces.h" "ChessBoard.cpp" "ChessBoard.h" Setup.cpp Setup.h alphabeta.cpp alphabeta.h)
+add_executable(RobotsPlayingChess main.cpp "src/ChessPieces.cpp" "headers/ChessPieces.h" "src/ChessBoard.cpp" "headers/ChessBoard.h" src/Setup.cpp headers/Setup.h src/alphabeta.cpp headers/alphabeta.h)

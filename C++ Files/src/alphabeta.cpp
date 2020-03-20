@@ -2,7 +2,7 @@
 // Created by themagicalplace on 3/20/20.
 //
 
-#include "alphabeta.h"
+#include "../headers/alphabeta.h"
 #include <vector>
 ChessNode::ChessNode(const ChessNode *, int depth,const std::map<string, Piece *> &board) {
 

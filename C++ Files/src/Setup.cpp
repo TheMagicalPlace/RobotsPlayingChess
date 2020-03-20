@@ -2,8 +2,8 @@
 // Created by themagicalplace on 3/19/20.
 //
 
-#include "Setup.h"
-#include "ChessPieces.h"
+#include "../headers/Setup.h"
+#include "../headers/ChessPieces.h"
 #include <printf.h>
 using namespace std;
 

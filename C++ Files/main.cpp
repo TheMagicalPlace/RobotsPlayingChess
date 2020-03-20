@@ -3,8 +3,8 @@
 #include <iostream>
 #include <algorithm>
 #include <fstream>
-#include "ChessPieces.h"
-#include "Setup.h"
+#include "headers/ChessPieces.h"
+#include "headers/Setup.h"
 using namespace std;
 void test1();
 

@@ -2,7 +2,7 @@
 // Created by 17344 on 3/19/2020.
 //
 
-#include "ChessBoard.h"
+#include "../headers/ChessBoard.h"
 
 void Chessboard::ChessBoard::setup() {
     string letters = "abcdefgh";

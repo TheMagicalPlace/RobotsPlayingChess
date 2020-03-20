@@ -7,7 +7,7 @@
 
 #include <algorithm>
 #include <utility>
-#include "ChessPieces.h"
+#include "../headers/ChessPieces.h"
 
 // Parent 'Piece' Methods
 
