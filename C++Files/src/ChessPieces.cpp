@@ -11,6 +11,8 @@
 
 // Parent 'Piece' Methods
 
+using  string = std::string ;
+
 ChessPieces::Piece::Piece(std::string owner,std::string position,std::string piece)
     :owner(owner),piece(piece),position(position) {
     rng_val = get_rng_val();
@@ -64,20 +66,20 @@ std::vector<std::string> ChessPieces::Piece::move_range(std::map<std::string, Pi
         if (up_right != "-1") {
             char a = (int) position[0] + i;
             char b = (int) position[1] + i;
-            up_right[0] = b;
-            up_right[1] = a;
+            up_right[0] = a;
+            up_right[1] = b;
         }
         if (up_left != "-1") {
             char a = (int) position[0] + i;
             char b = (int) position[1] - i;
-            up_left[0] = b;
-            up_left[1] = a;
+            up_left[0] = a;
+            up_left[1] = b;
         }
         if (down_right != "-1") {
             char a = (int) position[0] - i;
             char b = (int) position[1] + i;
-            down_right[0] = b;
-            down_right[1] = a;
+            down_right[0] = a;
+            down_right[1] = b;
         }
         if (down_left != "-1") {
             char a = (int) position[0] - i;
@@ -88,20 +90,20 @@ std::vector<std::string> ChessPieces::Piece::move_range(std::map<std::string, Pi
         }
         if (up != "-1") {
             char a = (int) position[0] + i;
-            char b = (int) position[1];
+            char b =  position[1];
             up[0] = a;
             up[1] = b;
 
         }
         if (down != "-1") {
             char a = (int) position[0] - i;
-            char b = (int) position[1];
-            down[0] =b;
-            down[1] = a;
+            char b =  position[1];
+            down[0] =a;
+            down[1] = b;
 
         }
         if (left != "-1") {
-            char a = (int) position[0];
+            char a =  position[0];
             char b = (int) position[1] - i;
             left[0] = a;
             left[1] = b;
@@ -109,7 +111,7 @@ std::vector<std::string> ChessPieces::Piece::move_range(std::map<std::string, Pi
         }
         if (right != "-1") {
             char a;
-            a = (int) position[0];
+            a =  position[0];
             char b;
             b = (int) position[1] + i;
             right[0] = a;
@@ -117,30 +119,33 @@ std::vector<std::string> ChessPieces::Piece::move_range(std::map<std::string, Pi
         }
 
         // setting up intermediate holding vectors
-        std::vector<std::string> next {up,down,left,right,up_left,up_right,down_left,down_right};
+        std::vector<std::string *> next {&up,&down,&left,&right,&up_left,&up_right,&down_left,&down_right};
         std::vector<std::string> pots{};
         std::vector<std::string> potsR{};
 
         // Removing invalid moves
-        for (auto &nxt : next)
+        for (auto nxt : next)
 
         {
-            std::cout <<nxt << " ";
-            if(std::count(letters.begin(),letters.end(),nxt[0]) == 1 && std::count(numbers.begin(),numbers.end(),nxt[1]) == 1)
+            string nxt_val = *nxt;
+            //std::cout <<nxt_val << " ";
+            if(std::count(numbers.begin(),numbers.end(),nxt_val[0]) == 1 && std::count(letters.begin(),letters.end(),nxt_val[1]) == 1)
             {
-                pots.push_back(nxt);
+                pots.push_back(nxt_val);
             }
         }
+        //std::cout <<std::endl;
 
         // Can't move onto friendly spaces (except during king check)
         for  (auto &pot : pots)
         {
 
-            std::cout << current_state[pot]->get_owner() << owner << " "<< (owner == current_state[pot]->get_owner());
+
             if (current_state[pot]->get_owner() != owner || is_king_check)
             {
                 potsR.push_back(pot);
-                std::cout << pot << " ";
+                //std::cout << current_state[pot]->get_owner()<< " " << owner << " " <<pot<<  "| ";
+                //std::cout << pot << " ";
             }
         }
 
@@ -188,52 +193,73 @@ std::vector<std::string> ChessPieces::Piece::move_range(std::map<std::string, Pi
             }
         }
 
+        // Kings can only move one space
+        if(this->get_piece() == "Kng")
+            break;
 
         // removing relevant nodes from consideration
         sort(tr.begin(), tr.end());
-        for(size_t i = 0; i < potsR.size(); i++)
+
+
+
+        // removing spaces that allow no further movement past it
+
+
+        for(auto & r : potsR)
         {
-            if (binary_search(tr.begin(), tr.end(), potsR[i]))
+            if (std::count(tr.begin(), tr.end(), r))
             {
-                swap(potsR[i], potsR[potsR.size()-1]); //remove current element by swapping with last
-                potsR.pop_back();     // and removing new last by shrinking
+                r = "-1";
             }
         }
 
+
+        // assigning
         for(int i{0};i<next.size();++i)
         {
             if (is_king_check)
             {
-                if (not std::count(potsR.begin(),potsR.end(),next[i]) || current_state[next[i]][0].owner == owner)
+                if (not std::count(potsR.begin(),potsR.end(),*next[i]) || current_state[*next[i]][0].owner == owner)
                 {
-                    next[i] = "-1";
+                    *next[i] = "-1";
                 }
 
             }
             else
             {
-                if (not std::count(potsR.begin(),potsR.end(),next[i]))
+                if (not std::count(potsR.begin(),potsR.end(),*next[i]))
                 {
-                    next[i] = "-1";
+                    *next[i] = "-1";
                 }
             }
         }
-        for(auto &a : next)
-        {
-            std::cout << a << " ";
-        }
-        std::cout <<std::endl;
+
+        //checking that next values are correct
+        //for(auto &a : next)
+        //{
+        //    std::cout << *a << " ";
+        //}
+        //std::cout <<std::endl;
 
 
     }
+    std::sort(moves.begin(),moves.end());
+    std::cout <<std::endl<<"Piece : "<<this->piece<<std::endl<<"Moves : ";
     for(auto &a : moves)
     {
         std::cout << a << " ";
     }
+
     return std::vector<std::string>();
 }
 
-std::vector<std::string> ChessPieces::Piece::move_range_pawn(std::map<std::string, Piece *>& current_state, bool is_king_check){}
+std::vector<std::string> ChessPieces::Piece::move_range_pawn(std::map<std::string, Piece *>& current_state, bool is_king_check)
+{
+    if(owner=="Black")
+    {
+
+    }
+}
 
 std::vector<std::string> ChessPieces::Piece::move_range_knight(std::map<std::string, Piece *>& current_state, bool is_king_check){}
 

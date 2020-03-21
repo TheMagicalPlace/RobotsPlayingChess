@@ -10,7 +10,7 @@
 #ifndef PROJ1_SETUP_H
 #define PROJ1_SETUP_H
 
-
+void piece_string_conversion(std::string& pos);
 class Setup {
 public:
     std::string path;

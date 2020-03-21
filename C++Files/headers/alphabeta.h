@@ -28,8 +28,11 @@ public:
     ChessNode(const ChessNode * parent,int depth,const std::map<string,Piece *> &board );
     ChessNode spawn_child( Piece *piece,string move);
     Piece * next_piece();
+    void set_value(double val){value=val;};
+    double get_value(){ return value;};
+
 private:
-    int value{0};       // initializer value
+    double value{0};       // initializer value
     int depth{};
     std::vector<ChessNode *> childs{};
     ChessNode *parent{};
@@ -42,14 +45,18 @@ private:
 class AlphaBeta {
 public:
     std::map<std::string,std::string> opponent {{"Black","White"},{"White","Black"}};
+    AlphaBeta(string player,const std::map<string,Piece *> &board,int dpth,bool testing);
+    double call(bool maxing_player);
+
+private:
+
     bool testing;
+    ChessNode root_node;
+    int search_depth;
     string player;
-    AlphaBeta(string player,bool testing);
     std::vector<ChessNode> child_node_finder(ChessNode &node,int depth, bool is_maxing);
-    float node_evaluation_heuristic(ChessNode &node);
-    int ab_search(ChessNode &node,int depth,bool maxing_player,int alpha,int beta);
-
-
+    double node_evaluation_heuristic(ChessNode &node);
+    double ab_search(ChessNode &node,int depth,bool maxing_player,int alpha,int beta);
 
 
 
