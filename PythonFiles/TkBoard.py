@@ -1,6 +1,6 @@
 from tkinter import *
 import time
-from ChessPieces import *
+from PythonFiles.ChessPieces import *
 class ChessBoard:
 
 

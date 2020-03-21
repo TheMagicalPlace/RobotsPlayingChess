@@ -1,7 +1,7 @@
-from ChessBoard import *
+from PythonFiles.ChessBoard import *
 import logging
-from ChessPieces import *
-from Player_Base import *
+from PythonFiles.ChessPieces import *
+from PythonFiles.Player_Base import *
 class RandomAI(ChessTurnABC):
     """an 'AI' setting that semi-randomly selects a move, with a preference for moves that result in capturing
     an opponents piece"""

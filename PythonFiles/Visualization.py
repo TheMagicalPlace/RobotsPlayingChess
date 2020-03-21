@@ -52,7 +52,7 @@ class BoardRepresentation:
 
 if __name__ == '__main__':
 
-    from ChessBoard import *
+    from PythonFiles.ChessBoard import *
     test = Chessgame()
     b = BoardRepresentation(test._current_state_raw)
 

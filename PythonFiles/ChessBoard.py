@@ -1,11 +1,11 @@
 
-from Player_Base import *
+from PythonFiles.Player_Base import *
 import copy
 import random as r
 from abc import abstractclassmethod
-from Visualization import *
+from PythonFiles.Visualization import *
 from time import sleep
-from ChessPieces import *
+from PythonFiles.ChessPieces import *
 from colorama import Fore, Back, Style
 import time
 import os

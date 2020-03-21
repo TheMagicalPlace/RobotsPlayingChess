@@ -1,8 +1,8 @@
 import copy
 from collections import defaultdict
-from ChessBoard import Chessgame
-from Player_Base import *
-from ChessPieces import *
+from PythonFiles.ChessBoard import Chessgame
+from PythonFiles.Player_Base import *
+from PythonFiles.ChessPieces import *
 from multiprocessing import Queue,Pool
 from queue import Queue
 from typing import Dict,Tuple
