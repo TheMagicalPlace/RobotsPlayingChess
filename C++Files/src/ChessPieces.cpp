@@ -13,7 +13,7 @@
 
 using  string = std::string ;
 
-ChessPieces::Piece::Piece(std::string owner,std::string position,std::string piece)
+ChessPieces::Piece::Piece(std::string owner,std::string piece,std::string position)
     :owner(owner),piece(piece),position(position) {
     rng_val = get_rng_val();
     value = ChessPieces::pieces.piece_values[piece];
@@ -255,13 +255,16 @@ std::vector<std::string> ChessPieces::Piece::move_range(std::map<std::string, Pi
 
 std::vector<std::string> ChessPieces::Piece::move_range_pawn(std::map<std::string, Piece *>& current_state, bool is_king_check)
 {
+    std::cout << "pawn_move_called";
     if(owner=="Black")
     {
 
     }
+    return std::vector<std::string>();
 }
 
-std::vector<std::string> ChessPieces::Piece::move_range_knight(std::map<std::string, Piece *>& current_state, bool is_king_check){}
+std::vector<std::string> ChessPieces::Piece::move_range_knight(std::map<std::string, Piece *>& current_state, bool is_king_check)
+{ return std::vector<std::string>(); }
 
 void ChessPieces::Piece::update_positions(std::map<std::string, Piece> current_state) {
     rng_val = get_rng_val();

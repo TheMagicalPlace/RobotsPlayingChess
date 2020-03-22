@@ -5,8 +5,11 @@
 #include "../headers/alphabeta.h"
 #include <utility>
 #include <vector>
-ChessNode::ChessNode(const ChessNode *, int depth,const std::map<string, Piece *> &board) {
-
+#include <iostream>
+#include <iterator>
+ChessNode::ChessNode(const ChessNode *, int depth,std::map<string, Piece *> board)
+:board_iter(board.begin()),board(board)
+{
 }
 
 ChessNode ChessNode::spawn_child( Piece* piece, string move) {
@@ -25,10 +28,11 @@ ChessNode ChessNode::spawn_child( Piece* piece, string move) {
 }
 
 Piece* ChessNode::next_piece() {
+
     if (board_iter != board.end())
     {
         Piece * pce = board_iter->second;       // get the piece
-        board_iter++;                           // and advance the iterator
+        std::next(board_iter);                           // and advance the iterator
         return pce;
     }
     else
@@ -40,8 +44,8 @@ Piece* ChessNode::next_piece() {
 
 }
 
-AlphaBeta::AlphaBeta(string player,const std::map<string,Piece *> &board,int dpth,bool testing)
-:player{std::move(player)},testing{testing},root_node{ChessNode(nullptr,dpth,board)},search_depth{dpth}{
+AlphaBeta::AlphaBeta(string player,std::map<string,Piece *> &board,int dpth,bool testing)
+:player{std::move(player)},testing{testing},root_node(ChessNode(nullptr ,dpth,board)),search_depth{dpth}{
 
 }
 
@@ -57,15 +61,16 @@ std::vector<ChessNode> AlphaBeta::child_node_finder(ChessNode &node, int depth, 
     else
         current_player = opponent[player];
 
-
+    std::cout<<"made it to childnodeif"<<std::endl;
     // Implemented to be semi-analogous to a python generator, what this does is create the child nodes for each
     // piece at a time, therefore if the main alpha-beta search breaks early no time will have been wasted in
     // generating extraneous child nodes for the other pieces.
 
     Piece *piece = node.next_piece();
+    std::cout<<&piece;
     if (piece!= nullptr)
     {
-
+        std::cout<<" t "<<piece->get_piece();
         std::vector<std::string> moves = piece->move_range(node.board,false);
         if (piece->owner == current_player)
             for (string &move : moves)
@@ -107,8 +112,11 @@ double AlphaBeta::ab_search(ChessNode &node, int depth, bool maxing_player, int 
         node.set_value(value);
         return value;
     }
-
+    std::cout<<depth;
     std::vector<ChessNode> nodes = child_node_finder(node,depth,maxing_player);
+    std::cout<<"maxing";
+    for(auto &a:nodes)
+        std::cout<<"t";
     if (maxing_player)
     {
         value= -100000;
@@ -163,6 +171,7 @@ double AlphaBeta::ab_search(ChessNode &node, int depth, bool maxing_player, int 
 }
 
 double AlphaBeta::call(bool maxing_player) {
-    double result = ab_search(root_node,maxing_player,search_depth,-100000,100000);
+    std::cout<<"initializing call";
+    double result = ab_search(root_node,search_depth,maxing_player,-100000,100000);
     return result;
 }

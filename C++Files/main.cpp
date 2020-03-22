@@ -5,8 +5,14 @@
 #include <fstream>
 #include "headers/ChessPieces.h"
 #include "headers/Setup.h"
+#include "headers/alphabeta.h"
+
 using namespace std;
 void test1();
+
+void TestsA(Setup& s);
+void TestsB(Setup& setup);
+
 
 int main() {
 
@@ -16,7 +22,13 @@ int main() {
     file1.open("/home/themagicalplace/CLionProjects/RobotsPlayingChess/text1.txt");
 
     Setup s {};
+    TestsB(s);
+    return 0;
+};
 
+
+void TestsA(Setup& s)
+{
     auto pce3 = new ChessPieces::Piece("White","4a","Qun");
     auto a3 = pce3;
     a3->move_range(s.board,false );
@@ -39,12 +51,13 @@ int main() {
     auto a = pce;
     a->move_range(s.board,false );
     cout<<endl;
+}
 
+void TestsB(Setup& setup)
+{
 
+ AlphaBeta alphabeta_test{"White",setup.board,int{3},true};
+ double result = alphabeta_test.call(true);
+ cout<<result;
 
-
-
-    return 0;
-};
-
-
+}

@@ -15,7 +15,7 @@ class Setup {
 public:
     std::string path;
     std::ifstream stream;
-    std::map<std::string,ChessPieces::Piece *> board;
+    std::map<std::string,ChessPieces::Piece *> board{};
     Setup();
 
 };

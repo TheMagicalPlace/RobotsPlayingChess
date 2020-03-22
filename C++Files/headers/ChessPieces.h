@@ -45,7 +45,7 @@ static pieces{};
         std::string position;
 
 
-        Piece(std::string owner, std::string position, std::string piece);
+        Piece(std::string owner, std::string piece, std::string position);
 
         int show_rng_value() { return rng_val; };
 

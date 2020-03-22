@@ -25,7 +25,7 @@ class ChessNode
 public:
     std::map<string,Piece *> board;
     int index{0};       //TODO does this do anything?
-    ChessNode(const ChessNode * parent,int depth,const std::map<string,Piece *> &board );
+    ChessNode(const ChessNode * parent,int depth,std::map<string,Piece *> board );
     ChessNode spawn_child( Piece *piece,string move);
     Piece * next_piece();
     void set_value(double val){value=val;};
@@ -36,7 +36,7 @@ private:
     int depth{};
     std::vector<ChessNode *> childs{};
     ChessNode *parent{};
-    std::map<string,Piece *>::iterator board_iter=board.begin();
+    std::map<string,Piece *>::iterator board_iter;
     int iter_count{0};
 };
 
@@ -45,7 +45,7 @@ private:
 class AlphaBeta {
 public:
     std::map<std::string,std::string> opponent {{"Black","White"},{"White","Black"}};
-    AlphaBeta(string player,const std::map<string,Piece *> &board,int dpth,bool testing);
+    AlphaBeta(string player,std::map<string,Piece *> &board,int dpth,bool testing);
     double call(bool maxing_player);
 
 private:

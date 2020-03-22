@@ -18,21 +18,30 @@ Setup::Setup() {
     ifstream file1;
     file1.open("/home/themagicalplace/CLionProjects/RobotsPlayingChess/text1.txt");
 
+
+
     while (!file1.eof()) {
         string pos;
         string piece;
         string owner;
+
         file1 >> pos;file1 >> piece; file1 >> owner;
+        if(pos.empty() || piece.empty() || owner.empty())
+            break;
+        std::cout<<pos<< "-"<<piece<<"-"<<owner<<"|";
         piece_string_conversion(pos);
-        ChessPieces::Piece* pce {get_piece(piece, pos, owner)};
+        ChessPieces::Piece* pce = get_piece(piece, pos, owner);
         board.insert(pair<string,ChessPieces::Piece*>(pos,pce));
 
 
     }
+    auto a = *board.begin()->second;
+    std::cout<<"first "<<a.position;
+
     for(const auto& elem :  board)
     {
         auto h = *elem.second;
-        //std::cout << elem.first  << " " << h.position <<" " <<h.owner << "\n";
+        std::cout << elem.first  << " " << h.position <<" " <<h.owner << "\n";
     }
 
 
