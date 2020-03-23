@@ -37,7 +37,7 @@ private:
     std::vector<ChessNode *> childs{};
     ChessNode *parent{};
     std::map<string,Piece *>::iterator board_iter;
-    int iter_count{0};
+    ChessPieces::Piece* current_piece = board_iter->second;
 };
 
 

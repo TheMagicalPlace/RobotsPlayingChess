@@ -140,8 +140,8 @@ std::vector<std::string> ChessPieces::Piece::move_range(std::map<std::string, Pi
         for  (auto &pot : pots)
         {
 
-
-            if (current_state[pot]->get_owner() != owner || is_king_check)
+            string temp = current_state[pot]->owner;
+            if (temp != owner || is_king_check)
             {
                 potsR.push_back(pot);
                 //std::cout << current_state[pot]->get_owner()<< " " << owner << " " <<pot<<  "| ";
@@ -293,21 +293,23 @@ std::vector<std::string> ChessPieces::Piece::move_range_pawn(std::map<std::strin
         temp.push_back(a);temp.push_back(b);
         if(std::count(numbers.begin(),numbers.end(),a) == 1 && std::count(letters.begin(),letters.end(),b) == 1)
         {
-            if(current_state[temp]->owner == opponent[owner])
+            if(current_state[temp]->owner == opponent[owner] || is_king_check)
             {
                 attacks.push_back(temp);
+                foreward.push_back(temp);
             }
-            foreward.push_back(temp);
+
         }
         a = (int) position[0] - 1;
-        b =  (int)position[1] + 1;
+        b =  (int)position[1] - 1;
         if(std::count(numbers.begin(),numbers.end(),a) == 1 && std::count(letters.begin(),letters.end(),b) == 1)
         {
-            if(current_state[temp]->owner == opponent[owner])
+            if(current_state[temp]->owner == opponent[owner] || is_king_check)
             {
                 attacks.push_back(temp);
+                foreward.push_back(temp);
             }
-            foreward.push_back(temp);
+
         }
     }
 
@@ -339,23 +341,24 @@ std::vector<std::string> ChessPieces::Piece::move_range_pawn(std::map<std::strin
         temp.push_back(a);temp.push_back(b);
         if(std::count(numbers.begin(),numbers.end(),a) == 1 && std::count(letters.begin(),letters.end(),b) == 1)
         {
-            if(current_state[temp]->owner == opponent[owner])
+            if(current_state[temp]->owner == opponent[owner] || is_king_check)
             {
                 attacks.push_back(temp);
             }
-            foreward.push_back(temp);
+
         }
         temp.clear();
 
         a = (int) position[0] - 1;
-        b =  (int)position[1] + 1;
+        b =  (int)position[1] - 1;
         if(std::count(numbers.begin(),numbers.end(),a) == 1 && std::count(letters.begin(),letters.end(),b) == 1)
         {
-            if(current_state[temp]->owner == opponent[owner])
+            if(current_state[temp]->owner == opponent[owner] || is_king_check)
             {
                 attacks.push_back(temp);
+                foreward.push_back(temp);
             }
-            foreward.push_back(temp);
+
         }
     }
 
@@ -404,8 +407,8 @@ std::vector<std::string> ChessPieces::Piece::move_range_knight(std::map<std::str
             }
 
 
-            a = (int) position[0] + i;
-            b = (int) position[1] - j;
+            a = (int) position[0] + j;
+            b = (int) position[1] - i;
             if (std::count(numbers.begin(), numbers.end(), a) == 1 &&
                 std::count(letters.begin(), letters.end(), b) == 1) {
                 temp[0] = a;
@@ -415,8 +418,8 @@ std::vector<std::string> ChessPieces::Piece::move_range_knight(std::map<std::str
                 }
             }
 
-            a = (int) position[0] + i;
-            b = (int) position[1] - j;
+            a = (int) position[0] - j;
+            b = (int) position[1] - i;
             if (std::count(numbers.begin(), numbers.end(), a) == 1 &&
                 std::count(letters.begin(), letters.end(), b) == 1) {
                 temp[0] = a;

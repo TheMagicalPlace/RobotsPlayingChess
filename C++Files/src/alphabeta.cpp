@@ -19,8 +19,8 @@ ChessNode ChessNode::spawn_child( Piece* piece, string move) {
     if (piece->position.length() > 2)
         std::cout << piece->position;
     string old = piece->position;
-    nboard[move] = piece;
-    *nboard[old] = Piece("None",old,"NA");
+    *nboard[move] = *piece;
+    *nboard[old] = Piece("None","NA",old);
     ChessNode new_node = ChessNode(this, this->depth+1, nboard);
     new_node.parent = this;
     this->childs.push_back(&new_node);
@@ -32,7 +32,7 @@ Piece* ChessNode::next_piece() {
     if (board_iter != board.end())
     {
         Piece * pce = board_iter->second;       // get the piece
-        std::next(board_iter);                           // and advance the iterator
+        board_iter = std::next(board_iter);                           // and advance the iterator
         return pce;
     }
     else
@@ -66,18 +66,24 @@ std::vector<ChessNode> AlphaBeta::child_node_finder(ChessNode &node, int depth, 
     // piece at a time, therefore if the main alpha-beta search breaks early no time will have been wasted in
     // generating extraneous child nodes for the other pieces.
 
-    Piece *piece = node.next_piece();
+    Piece piece = *node.next_piece();
     std::cout<<&piece;
-    if (piece!= nullptr)
+    while (&piece!= nullptr)
     {
-        std::cout<<" t "<<piece->get_piece();
-        std::vector<std::string> moves = piece->move_range(node.board,false);
-        if (piece->owner == current_player)
+        std::cout<<" t "<<piece.get_piece();
+        std::vector<std::string> moves = piece.move_range(node.board,false);
+        if (piece.owner == current_player)
             for (string &move : moves)
             {
-                piece->get_position(node.board);
-                next_nodes.push_back(node.spawn_child(piece,move));
+                piece.get_position(node.board);
+                next_nodes.push_back(node.spawn_child(&piece,move));
             }
+        if (next_nodes.empty())
+        {
+            std::cout<<piece.position<<" is empty, moving to next";
+            piece = *node.next_piece();
+        } else
+            return next_nodes;
     }
 
     // returns the empty vector
