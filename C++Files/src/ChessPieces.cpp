@@ -32,8 +32,8 @@ std::vector<std::string> ChessPieces::Piece::move_range(std::map<std::string, Pi
     {
         return move_range_knight(current_state,is_king_check);
     }
-    const std::string letters{"abcdefghABCDEFGH"};
-    const std::string numbers{"12345678"};
+    static const std::string letters{"abcdefghABCDEFGH"};
+    static const std::string numbers{"12345678"};
     moves.clear();      // clears out move vector upon new move search;
 
     // Setting up individual directions to check in
@@ -255,16 +255,180 @@ std::vector<std::string> ChessPieces::Piece::move_range(std::map<std::string, Pi
 
 std::vector<std::string> ChessPieces::Piece::move_range_pawn(std::map<std::string, Piece *>& current_state, bool is_king_check)
 {
+
+    static const std::string letters{"abcdefghABCDEFGH"};
+    static const std::string numbers{"12345678"};
+    using namespace std;
     std::cout << "pawn_move_called";
+    vector<string> foreward{};
+    vector<string> attacks{};
+    string temp{""};
+
+    // Black Pawns
     if(owner=="Black")
     {
+        // pawns can move foreword one space
+        char a = (int) position[0] - 1;
+        char b =  position[1];
+        temp.push_back(a);temp.push_back(b);
+        if(current_state[temp]->owner == "None")
+            foreward.push_back(temp);
+        temp.clear();
 
+        // pawns that havent moved can move two
+        if(position[0] == '7')
+        {
+            char a = (int) position[0] - 2;
+            char b =  position[1];
+            temp.push_back(a);temp.push_back(b);
+            if(current_state[temp]->owner == "None")
+                foreward.push_back(temp);
+            temp.clear();
+        }
+
+        // getting potential attack moves
+        char c;char d;
+        a = (int) position[0] - 1;
+        b =  (int)position[1] + 1;
+        temp.push_back(a);temp.push_back(b);
+        if(std::count(numbers.begin(),numbers.end(),a) == 1 && std::count(letters.begin(),letters.end(),b) == 1)
+        {
+            if(current_state[temp]->owner == opponent[owner])
+            {
+                attacks.push_back(temp);
+            }
+            foreward.push_back(temp);
+        }
+        a = (int) position[0] - 1;
+        b =  (int)position[1] + 1;
+        if(std::count(numbers.begin(),numbers.end(),a) == 1 && std::count(letters.begin(),letters.end(),b) == 1)
+        {
+            if(current_state[temp]->owner == opponent[owner])
+            {
+                attacks.push_back(temp);
+            }
+            foreward.push_back(temp);
+        }
     }
-    return std::vector<std::string>();
+
+    else if(owner=="White")
+    {
+        // pawns can move foreword one space
+        char a = (int) position[0] + 1;
+        char b =  position[1];
+        temp.push_back(a);temp.push_back(b);
+        if(current_state[temp]->owner == "None")
+            foreward.push_back(temp);
+        temp.clear();
+
+        // pawns that havent moved can move two
+        if(position[0] == '2')
+        {
+            char a = (int) position[0] + 2;
+            char b =  position[1];
+            temp.push_back(a);temp.push_back(b);
+            if(current_state[temp]->owner == "None")
+                foreward.push_back(temp);
+            temp.clear();
+        }
+
+        // getting potential attack moves
+        char c;char d;
+        a = (int) position[0] - 1;
+        b =  (int)position[1] + 1;
+        temp.push_back(a);temp.push_back(b);
+        if(std::count(numbers.begin(),numbers.end(),a) == 1 && std::count(letters.begin(),letters.end(),b) == 1)
+        {
+            if(current_state[temp]->owner == opponent[owner])
+            {
+                attacks.push_back(temp);
+            }
+            foreward.push_back(temp);
+        }
+        temp.clear();
+
+        a = (int) position[0] - 1;
+        b =  (int)position[1] + 1;
+        if(std::count(numbers.begin(),numbers.end(),a) == 1 && std::count(letters.begin(),letters.end(),b) == 1)
+        {
+            if(current_state[temp]->owner == opponent[owner])
+            {
+                attacks.push_back(temp);
+            }
+            foreward.push_back(temp);
+        }
+    }
+
+    // only need to consider attacks
+    if(is_king_check)
+    {
+        return attacks;
+    }
+    else{
+        return foreward;
+    }
 }
 
 std::vector<std::string> ChessPieces::Piece::move_range_knight(std::map<std::string, Piece *>& current_state, bool is_king_check)
-{ return std::vector<std::string>(); }
+{
+
+    static const std::string letters{"abcdefghABCDEFGH"};
+    static const std::string numbers{"12345678"};
+    string temp{"aa"};
+    std::vector<string> potential_moves{};
+    char a;char b;
+    for(int i{1};i<3;++i) {
+        for (int j{1}; j < 3; ++j) {
+            if (i == j)
+                continue;
+            a = (int) position[0] + i;
+            b = (int) position[1] + j;
+            if (std::count(numbers.begin(), numbers.end(), a) == 1 &&
+                std::count(letters.begin(), letters.end(), b) == 1) {
+                temp[0] = a;
+                temp[1] = b;
+                if (current_state[temp]->owner != owner) {
+                    potential_moves.push_back(temp);
+                }
+            }
+            //
+            a = (int) position[0] - i;
+            b = (int) position[1] - j;
+            if (std::count(numbers.begin(), numbers.end(), a) == 1 &&
+                std::count(letters.begin(), letters.end(), b) == 1) {
+                temp[0] = a;
+                temp[1] = b;
+                if (current_state[temp]->owner != owner) {
+                    potential_moves.push_back(temp);
+                }
+            }
+
+
+            a = (int) position[0] + i;
+            b = (int) position[1] - j;
+            if (std::count(numbers.begin(), numbers.end(), a) == 1 &&
+                std::count(letters.begin(), letters.end(), b) == 1) {
+                temp[0] = a;
+                temp[1] = b;
+                if (current_state[temp]->owner != owner) {
+                    potential_moves.push_back(temp);
+                }
+            }
+
+            a = (int) position[0] + i;
+            b = (int) position[1] - j;
+            if (std::count(numbers.begin(), numbers.end(), a) == 1 &&
+                std::count(letters.begin(), letters.end(), b) == 1) {
+                temp[0] = a;
+                temp[1] = b;
+                if (current_state[temp]->owner != owner) {
+                    potential_moves.push_back(temp);
+                }
+            }
+        }
+    }
+    return potential_moves;
+}
 
 void ChessPieces::Piece::update_positions(std::map<std::string, Piece> current_state) {
     rng_val = get_rng_val();
