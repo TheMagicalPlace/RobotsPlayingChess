@@ -18,12 +18,6 @@
 
 using namespace std;
 
-std::shared_ptr<ChessPieces::Piece> get_piece(const string piece,const string position,const string owner)
-{
-    return std::make_shared<ChessPieces::Piece> (owner,piece,position);
-
-
-}
 
 Setup::Setup() {
     ifstream file1;
@@ -41,7 +35,7 @@ Setup::Setup() {
             break;
         std::cout<<pos<< "-"<<piece<<"-"<<owner<<"|";
         piece_string_conversion(pos);
-        std::shared_ptr<ChessPieces::Piece> pce = get_piece(piece, pos, owner);
+        std::shared_ptr<ChessPieces::Piece> pce = std::make_shared<ChessPieces::Piece>(owner, pos, piece);
         board.insert(pair<string,std::shared_ptr<ChessPieces::Piece>>(pos,pce));
 
 

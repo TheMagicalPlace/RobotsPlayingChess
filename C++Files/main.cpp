@@ -10,8 +10,8 @@
 using namespace std;
 void test1();
 
-void TestsA(Setup& s);
-double TestsB(Setup& setup);
+void TestsA(Setup s);
+double TestsB(std::map<std::string,std::shared_ptr<ChessPieces::Piece>> setup);
 
 
 int main() {
@@ -22,7 +22,9 @@ int main() {
     file1.open("/home/themagicalplace/CLionProjects/RobotsPlayingChess/text1.txt");
 
     Setup s {};
-    double d {TestsB(s)};
+    s.board;
+    auto board = std::move(s.board);
+    double d {TestsB(board)};
     return 0;
 };
 
@@ -53,11 +55,30 @@ void TestsA(Setup& s)
     cout<<endl;
 }
 
-double TestsB(Setup& setup)
+double TestsB(std::map<std::string,std::shared_ptr<ChessPieces::Piece>> setup)
 {
-
- AlphaBeta alphabeta_test{"White",setup.board,int{6},true};
- double result = alphabeta_test.call(true);
- return result;
+    for(int i{2};i<8;++i) {
+        std::time_t init = std::time(nullptr);
+        AlphaBeta alphabeta_test{"White", setup, int{i}, true};
+        delete &alphabeta_test;
+        double result = alphabeta_test.call(true);
+        delete &alphabeta_test;
+        cout << "Depth : " << i << " Run Time : " << init - std::time(nullptr) << endl;
+        cout << "Final Size of AB object : " << sizeof(alphabeta_test) << " Result : " << result << endl << endl;
+    }
 
 }
+
+void TestSizes(){
+    std::cout<<"Size of 'double' :"<<sizeof(double)<<endl;
+    std::cout<<"Size of 'Piece' :"<<sizeof(Piece)<<endl;
+    std::cout<<"Size of 'Chess Node' :"<<sizeof(ChessNode)<<endl;
+    std::cout<<"Size of 'AB object' :"<<sizeof(AlphaBeta)<<endl;
+    std::cout<<"Size of 'Setup' :"<<sizeof(Setup)<<endl;
+    std::cout<<"Size of '*Piece' :"<<sizeof(std::__shared_ptr<Piece>)<<endl;
+    std::cout<<"Size of 'instanced Piece' :"<<sizeof(ChessPieces::Piece("White","4a","Bsp"))<<endl;
+    std::cout<<"Size of 'instanced Setup' :"<<sizeof(Setup {})<<endl;
+    std::cout<<"Size of '*Piece' :"<<sizeof(std::__shared_ptr<Piece>)<<endl;
+    std::cout<<"Size of 'map' :"<<sizeof(std::map<string,std::shared_ptr<ChessPieces::Piece>>)<<endl;
+
+};

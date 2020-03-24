@@ -71,7 +71,7 @@ class AlphaBeta {
 public:
     const std::map<std::string,std::string> opponent {{"Black","White"},{"White","Black"},{"None","None"}};
 
-    AlphaBeta(string player, std::map<string, std::shared_ptr<ChessPieces::Piece>> const &board, int dpth, bool testing)
+    AlphaBeta(string player, std::map<string, std::shared_ptr<ChessPieces::Piece>> const board, int dpth, bool testing)
         :player{std::move(player)},
         testing{testing},
         root_node{std::make_shared<ChessNode>(nullptr ,dpth,board)},
