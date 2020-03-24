@@ -18,7 +18,7 @@
 
 using namespace std;
 
-std::shared_ptr<ChessPieces::Piece> get_piece(string piece,string position,string owner)
+std::shared_ptr<ChessPieces::Piece> get_piece(const string piece,const string position,const string owner)
 {
     return std::make_shared<ChessPieces::Piece> (owner,piece,position);
 

@@ -16,19 +16,17 @@ using  string = std::string ;
 
 const std::map<std::string, int> ChessPieces::Piece::piece_values
         {
-                {"Kng", 100000},
+                {"Kng", 10000},
                 {"Qun", 10},
                 {"Knt", 4},
                 {"Pwn", 1},
                 {"Twr", 4},
-                {"Bsp", 5}
+                {"Bsp", 5},
+                {"na",0},
+                {"EXIT",0}
         };
 
 
-int ChessPieces::Piece::get_rng_val() {
-    srand(time(nullptr));
-    return rand();
-}
 
 std::vector<std::string> ChessPieces::Piece::move_range(std::map<string, std::shared_ptr<Piece>>const &current_state, bool is_king_check) {
     if (piece == "Pwn"){
@@ -125,7 +123,7 @@ std::vector<std::string> ChessPieces::Piece::move_range(std::map<string, std::sh
         }
 
         // setting up intermediate holding vectors
-        std::vector<std::string *> next {&up,&down,&left,&right,&up_left,&up_right,&down_left,&down_right};
+        std::vector<std::string *> next {&up,&down,&left,&right,&up_left,&up_right,&down_left,&down_right};     // this really doesnt need to be pointers but whatever
         std::vector<std::string> pots{};
         std::vector<std::string> potsR{};
 
@@ -146,7 +144,7 @@ std::vector<std::string> ChessPieces::Piece::move_range(std::map<string, std::sh
         for  (auto &pot : pots)
         {
 
-            string temp = current_state[pot]->owner;
+            string temp = current_state.at(pot)->owner;
             if (temp != owner || is_king_check)
             {
                 potsR.push_back(pot);
@@ -161,9 +159,9 @@ std::vector<std::string> ChessPieces::Piece::move_range(std::map<string, std::sh
             if(is_king_check)
             // accounts for opposing pieces as an avalible move & blocker
             {
-                if (current_state[pot][0].owner == opponent[owner])
+                if (current_state.at(pot)->owner == opponent.at(owner))
                 {
-                    if (current_state[pot][0].get_piece() == "Kng" && current_state[pot][0].owner != owner)
+                    if (current_state.at(pot)->piece == "Kng" && current_state.at(pot)->owner != owner)
                     {
                         moves.push_back(pot);
                     }
@@ -174,7 +172,7 @@ std::vector<std::string> ChessPieces::Piece::move_range(std::map<string, std::sh
                     }
 
                 }
-                else if (current_state[pot][0].owner == owner)
+                else if (current_state.at(pot)->owner == owner)
                 {
                     tr.push_back(pot);
                     moves.push_back(pot);
@@ -187,7 +185,7 @@ std::vector<std::string> ChessPieces::Piece::move_range(std::map<string, std::sh
             }
             else
             {
-                if (current_state[pot][0].owner == opponent[owner])
+                if (current_state.at(pot)->owner == opponent.at(owner))
                 {
                     moves.push_back(pot);
                     tr.push_back(pot);
@@ -221,11 +219,12 @@ std::vector<std::string> ChessPieces::Piece::move_range(std::map<string, std::sh
 
 
         // assigning
+        // This is also pretty bad but shouldn't break anything so...
         for(int i{0};i<next.size();++i)
         {
             if (is_king_check)
             {
-                if (not std::count(potsR.begin(),potsR.end(),*next[i]) || current_state[*next[i]][0].owner == owner)
+                if (not std::count(potsR.begin(),potsR.end(),*next[i]) || current_state.at(*next[i])->owner == owner)
                 {
                     *next[i] = "-1";
                 }
@@ -325,7 +324,7 @@ std::vector<std::string> ChessPieces::Piece::move_range_pawn(std::map<std::strin
         char a = (int) position[0] + 1;
         char b =  position[1];
         temp.push_back(a);temp.push_back(b);
-        if(current_state[temp]->owner == "None")
+        if(current_state.at(temp)->owner == "None")
             foreward.push_back(temp);
         temp.clear();
 
@@ -335,7 +334,7 @@ std::vector<std::string> ChessPieces::Piece::move_range_pawn(std::map<std::strin
             char a = (int) position[0] + 2;
             char b =  position[1];
             temp.push_back(a);temp.push_back(b);
-            if(current_state[temp]->owner == "None")
+            if(current_state.at(temp)->owner == "None")
                 foreward.push_back(temp);
             temp.clear();
         }
@@ -442,16 +441,16 @@ std::vector<std::string> ChessPieces::Piece::move_range_knight( std::map<std::st
 }
 
 
-# TODO update this
-std::string ChessPieces::Piece::get_position(std::map<std::string, Piece *> &current_state) {
+// TODO update this
+std::string ChessPieces::Piece::get_position(std::map<std::string,std::shared_ptr<Piece>> const &current_state) {
     for (auto &space :current_state)
     {
-        if (space.second == this)
+        if (space.second == std::make_shared<Piece>(*this))     // TODO see what this is doing
             return space.first;
     }
     return "not found";
 }
 
-}
+
 
 

@@ -29,7 +29,7 @@ namespace ChessPieces {
 
     public:
         static const std::map<std::string, int> piece_values;
-        const std::map<std::string,std::string> opponent {{"Black","White"},{"White","Black"}};
+        const std::map<std::string,std::string> opponent {{"Black","White"},{"White","Black"},{"None","None"}};
         const std::string owner;
         std::string position;
         const std::string piece;
@@ -41,7 +41,7 @@ namespace ChessPieces {
         std::vector<std::string> move_range(std::map<std::string, std::shared_ptr<Piece>> const & board, bool is_king_check);
         std::vector<std::string> move_range_pawn(std::map<std::string, std::shared_ptr<Piece>> const & current_state, bool is_king_check);
         std::vector<std::string> move_range_knight(std::map<std::string, std::shared_ptr<Piece>> const & current_state, bool is_king_check);
-        std::string get_position(std::map<std::string, Piece *>& current_state);
+        std::string get_position(std::map<std::string,std::shared_ptr<Piece>> const & current_state);
 
     private:
         std::vector<std::string> moves{};

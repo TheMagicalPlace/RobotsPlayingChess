@@ -11,7 +11,7 @@ using namespace std;
 void test1();
 
 void TestsA(Setup& s);
-void TestsB(Setup& setup);
+double TestsB(Setup& setup);
 
 
 int main() {
@@ -22,7 +22,7 @@ int main() {
     file1.open("/home/themagicalplace/CLionProjects/RobotsPlayingChess/text1.txt");
 
     Setup s {};
-    TestsB(s);
+    double d {TestsB(s)};
     return 0;
 };
 
@@ -53,11 +53,11 @@ void TestsA(Setup& s)
     cout<<endl;
 }
 
-void TestsB(Setup& setup)
+double TestsB(Setup& setup)
 {
 
- AlphaBeta alphabeta_test{"White",setup.board,int{3},true};
+ AlphaBeta alphabeta_test{"White",setup.board,int{6},true};
  double result = alphabeta_test.call(true);
- cout<<result;
+ return result;
 
 }

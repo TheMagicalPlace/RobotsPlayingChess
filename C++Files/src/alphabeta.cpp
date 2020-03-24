@@ -16,35 +16,32 @@
 
 std::shared_ptr<ChessNode> ChessNode::spawn_child(std::shared_ptr<Piece> const &piece, string move) {
     auto nboard{this->board};
-    piece.position;
+
     // debugging invalid piece positions
-    if (piece.position.length() > 2)
-        std::cout << piece->position;
+    //if (piece->position.length() > 2)
+    //    std::cout << piece->position;
+
+    // get old piece position and reassign to new blank for child board and move piece to new position
     string old = piece->position;
-    *nboard[move] = *piece;
-    *nboard[old] = Piece("None","NA",old);
-    ChessNode *new_node = new ChessNode(this, this->depth + 1, nboard);
-    new_node->parent = this;
+    nboard[move] = piece;
+    nboard[old] = std::make_shared<Piece>("None","na",old);
+
+    // create new node & assign pointer
+    auto new_node= std::make_shared<ChessNode>(this_ptr, this->depth - 1, nboard);
+
     childs.push_back(new_node);
     return new_node;
 }
 
-void ouch (int signal)
-    {
-    printf("Caught segfault at address %d\n", signal);
-    exit(0);
-    };
 
-Piece* ChessNode::next_piece() {
-
-    signal(SIGSEGV,ouch);
+std::shared_ptr<Piece> ChessNode::next_piece() {
 
 
     if (index<64)
     {
-        ++index;
-        Piece * pce = &*board_iter->second;       // get the piece
-        board_iter++;// and advance the iterator
+
+        auto pce = board_iter[index];       // get the piece - smart pointer to piece
+        ++index;                            // and increase the index
         return pce;
 
     }
@@ -57,90 +54,100 @@ Piece* ChessNode::next_piece() {
 
 }
 
-AlphaBeta::AlphaBeta(string player, std::map<string, std::shared_ptr<ChessPieces::Piece>> board, int dpth, bool testing)
-:player{std::move(player)},testing{testing},root_node(ChessNode(nullptr ,dpth,board)),search_depth{dpth}{
-
-}
-
-std::vector<ChessNode*> AlphaBeta::child_node_finder(ChessNode node, int depth, bool is_maxing) {
+std::vector<std::shared_ptr<ChessNode>> AlphaBeta::child_node_finder(std::shared_ptr<ChessNode> const &node, int depth, bool is_maxing) const {
 
     // container for found children
-    std::vector<ChessNode*> next_nodes{} ;
+    std::vector<std::shared_ptr<ChessNode>> next_nodes{} ;
 
     // determines which players pieces moves are examined
     string current_player;
     if (is_maxing)
         current_player = player;
     else
-        current_player = opponent[player];
+        current_player = opponent.at(player);
 
 
     // Implemented to be semi-analogous to a python generator, what this does is create the child nodes for each
     // piece at a time, therefore if the main alpha-beta search breaks early no time will have been wasted in
     // generating extraneous child nodes for the other pieces.
 
-    Piece piece = *node.next_piece();
+    std::shared_ptr<Piece> piece = node->next_piece();
 
     //std::cout<<&piece;
-    while (piece.owner != "EXIT")
+    while (piece->owner != "EXIT")
     {
         //std::cout<<" t "<<piece.get_piece();
-        std::vector<std::string> moves = piece.move_range(node.board,false);
-        if (piece.owner == current_player)
-            for (string &move : moves)
-            {
-                piece.get_position(node.board);
-                next_nodes.push_back(node.spawn_child(&piece,move));
-            }
-        if (next_nodes.empty())
-        {
-            //std::cout<<piece.position<<" is empty, moving to next";
-            piece = *node.next_piece();
 
-        } else
-            return next_nodes;
+        if (piece->owner == current_player)
+        {
+            std::vector<std::string> moves = piece->move_range(node->board, false);
+            if (moves.empty()) {
+                //std::cout<<piece.position<<" is empty, moving to next";
+                piece = node->next_piece();
+            }
+            else
+            {
+                for (string &move : moves)
+                {
+                    next_nodes.push_back(node->spawn_child(piece, move));
+                }
+                return next_nodes;
+            }
+        }
+        else
+            piece = node->next_piece();
     }
 
     // returns the empty vector
     return next_nodes;
 }
 
-double AlphaBeta::node_evaluation_heuristic(ChessNode &node)
+double AlphaBeta::node_evaluation_heuristic(std::shared_ptr<ChessNode> const &node,bool is_maxing)
 {
     double value{0};
-    Piece next = *node.next_piece();
-    while (next.owner != "EXIT")
+    string current_player;
+    if (is_maxing)
+        current_player = player;
+    else
+        current_player = opponent.at(player);
+
+    std::shared_ptr<Piece> next = node->next_piece();
+    while (next->owner != "EXIT")
     {
         
-            if (next.owner == player)
+            if (next->owner == current_player)
             {
-                value += next.get_value();
+                value += next->value;
             }
-            else if (next.owner == next.opponent[next.owner])
+            else if (next->owner == next->opponent.at(current_player))
             {
-            value -= next.get_value();
+            value -= next->value;
             }
-        next = *node.next_piece();
+        next = node->next_piece();
     }
 
     return value;
 }
 
-double AlphaBeta::ab_search(ChessNode *node, int depth, bool maxing_player, int alpha, int beta) {
+double AlphaBeta::ab_search(std::shared_ptr<ChessNode> const &node, int depth, bool maxing_player, int alpha, int beta) {
+
+    // for debugging odd scores or exits
+    if (depth > (int)search_depth/2)
+    {
+        for(int i{depth};i<search_depth;++i)
+            std::cout<<"  ";
+        std::cout<< "Entering Depth : "<<depth<<std::endl;
+    }
+
+
     double value;
-    std::cout<< std::endl<<"depth : " << depth <<std::endl;
+
     // at maximum depth score board and assign value to node
     if (depth == 0)
+        value = node_evaluation_heuristic(node,maxing_player);
+    else if (maxing_player)
     {
-        value = node_evaluation_heuristic(*node);
-        node->set_value(value);
-        return value;
-    }
-    std::cout<<depth<< " "<<&node;
-    std::vector<ChessNode*> nodes = child_node_finder(*node,depth,maxing_player);
-
-    if (maxing_player)
-    {
+        auto nodes = child_node_finder(node,depth,maxing_player);
         value= -100000;
 
         // to reduce time+memory complexity, the child nodes are generated semi-lazily, that way if pruning occurs
@@ -155,45 +162,50 @@ double AlphaBeta::ab_search(ChessNode *node, int depth, bool maxing_player, int 
                 double val = ab_search(n,depth-1,false,alpha,beta);
                 value = std::fmax(val,value);
                 alpha = std::fmax(alpha,value);
-                if (alpha >=beta)
-                {
-                    node->set_value(value);
-                    return value;
-                }
             }
 
-            // getting next nodes to examine
-            nodes= child_node_finder(*node, depth, maxing_player);
+            // breaks out of the loop early on condition
+            if (alpha >=beta)
+                nodes.clear();
+            else
+                nodes= child_node_finder(node,depth,maxing_player);
 
         }
     }
     else
     {
+        auto nodes = child_node_finder(node,depth,maxing_player);
         value =100000;
-        while(not nodes.empty())
-        {
-            for(auto &n : nodes)
-            {
-                double val = ab_search(n,depth-1,true,alpha,beta);
-                value = std::fmin(val,value);
-                beta = std::fmin(beta,value);
-                if (alpha >=beta)
-                {
-                    node->set_value(value);
-                    return value;
-                }
+        while(not nodes.empty()) {
+            for (auto &n : nodes) {
+                double val = ab_search(n, depth - 1, true, alpha, beta);
+                value = std::fmin(val, value);
+                beta = std::fmin(beta, value);
             }
-            nodes= child_node_finder(*node,depth,maxing_player);
+
+            // breaks out of the loop early on condition
+            if (alpha >= beta)
+                nodes.clear();
+            else
+                nodes = child_node_finder(node, depth, maxing_player);
         }
     }
 
-    // If no pruning is done set node value & return
+    // for debugging odd scores or exits
+    if (depth > 1)
+    {
+        for(int i{depth};i<search_depth;++i)
+            std::cout<<"  ";
+        std::cout<< "Exiting Depth : "<<depth<<" Score : "<<value<<" Alpha : "<<alpha<<" Beta : "<<beta<<std::endl;
+    }
+
+    //  set node value & return
     node->set_value(value);
     return value;
 }
 
 double AlphaBeta::call(bool maxing_player) {
     std::cout<<"initializing call";
-    double result = ab_search(&root_node,search_depth,maxing_player,-100000,100000);
+    double result = ab_search(root_node,search_depth,maxing_player,-100000,100000);
     return result;
 }
