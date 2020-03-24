@@ -7,24 +7,30 @@
 
 #include <algorithm>
 #include <utility>
+#include <memory>
 #include "../headers/ChessPieces.h"
 
 // Parent 'Piece' Methods
 
 using  string = std::string ;
 
-ChessPieces::Piece::Piece(std::string owner,std::string piece,std::string position)
-    :owner(owner),piece(piece),position(position) {
-    rng_val = get_rng_val();
-    value = ChessPieces::pieces.piece_values[piece];
-}
+const std::map<std::string, int> ChessPieces::Piece::piece_values
+        {
+                {"Kng", 100000},
+                {"Qun", 10},
+                {"Knt", 4},
+                {"Pwn", 1},
+                {"Twr", 4},
+                {"Bsp", 5}
+        };
+
 
 int ChessPieces::Piece::get_rng_val() {
     srand(time(nullptr));
     return rand();
 }
 
-std::vector<std::string> ChessPieces::Piece::move_range(std::map<std::string, Piece *>& current_state, bool is_king_check) {
+std::vector<std::string> ChessPieces::Piece::move_range(std::map<string, std::shared_ptr<Piece>>const &current_state, bool is_king_check) {
     if (piece == "Pwn"){
         return move_range_pawn(current_state,is_king_check);
     }
@@ -194,7 +200,7 @@ std::vector<std::string> ChessPieces::Piece::move_range(std::map<std::string, Pi
         }
 
         // Kings can only move one space
-        if(this->get_piece() == "Kng")
+        if(this->piece == "Kng")
             break;
 
         // removing relevant nodes from consideration
@@ -244,22 +250,18 @@ std::vector<std::string> ChessPieces::Piece::move_range(std::map<std::string, Pi
 
     }
     std::sort(moves.begin(),moves.end());
-    std::cout <<std::endl<<"Piece : "<<this->piece<<std::endl<<"Moves : ";
-    for(auto &a : moves)
-    {
-        std::cout << a << " ";
-    }
+
 
     return std::vector<std::string>();
 }
 
-std::vector<std::string> ChessPieces::Piece::move_range_pawn(std::map<std::string, Piece *>& current_state, bool is_king_check)
+std::vector<std::string> ChessPieces::Piece::move_range_pawn(std::map<std::string, std::shared_ptr<Piece>> const & current_state, bool is_king_check)
 {
 
     static const std::string letters{"abcdefghABCDEFGH"};
     static const std::string numbers{"12345678"};
     using namespace std;
-    std::cout << "pawn_move_called";
+    //std::cout << "pawn_move_called";
     vector<string> foreward{};
     vector<string> attacks{};
     string temp{""};
@@ -271,7 +273,7 @@ std::vector<std::string> ChessPieces::Piece::move_range_pawn(std::map<std::strin
         char a = (int) position[0] - 1;
         char b =  position[1];
         temp.push_back(a);temp.push_back(b);
-        if(current_state[temp]->owner == "None")
+        if(current_state.at(temp)->owner == "None")
             foreward.push_back(temp);
         temp.clear();
 
@@ -281,7 +283,7 @@ std::vector<std::string> ChessPieces::Piece::move_range_pawn(std::map<std::strin
             char a = (int) position[0] - 2;
             char b =  position[1];
             temp.push_back(a);temp.push_back(b);
-            if(current_state[temp]->owner == "None")
+            if(current_state.at(temp)->owner == "None")
                 foreward.push_back(temp);
             temp.clear();
         }
@@ -293,24 +295,28 @@ std::vector<std::string> ChessPieces::Piece::move_range_pawn(std::map<std::strin
         temp.push_back(a);temp.push_back(b);
         if(std::count(numbers.begin(),numbers.end(),a) == 1 && std::count(letters.begin(),letters.end(),b) == 1)
         {
-            if(current_state[temp]->owner == opponent[owner] || is_king_check)
+            if(current_state.at(temp)->owner == opponent.at(owner) || is_king_check)
             {
                 attacks.push_back(temp);
                 foreward.push_back(temp);
             }
 
         }
+        temp.clear();
+
         a = (int) position[0] - 1;
         b =  (int)position[1] - 1;
+        temp.push_back(a);temp.push_back(b);
         if(std::count(numbers.begin(),numbers.end(),a) == 1 && std::count(letters.begin(),letters.end(),b) == 1)
         {
-            if(current_state[temp]->owner == opponent[owner] || is_king_check)
+            if(current_state.at(temp)->owner == opponent.at(owner)  || is_king_check)
             {
                 attacks.push_back(temp);
                 foreward.push_back(temp);
             }
 
         }
+        temp.clear();
     }
 
     else if(owner=="White")
@@ -341,7 +347,7 @@ std::vector<std::string> ChessPieces::Piece::move_range_pawn(std::map<std::strin
         temp.push_back(a);temp.push_back(b);
         if(std::count(numbers.begin(),numbers.end(),a) == 1 && std::count(letters.begin(),letters.end(),b) == 1)
         {
-            if(current_state[temp]->owner == opponent[owner] || is_king_check)
+            if(current_state.at(temp)->owner == opponent.at(owner)  || is_king_check)
             {
                 attacks.push_back(temp);
             }
@@ -351,9 +357,10 @@ std::vector<std::string> ChessPieces::Piece::move_range_pawn(std::map<std::strin
 
         a = (int) position[0] - 1;
         b =  (int)position[1] - 1;
+        temp.push_back(a);temp.push_back(b);
         if(std::count(numbers.begin(),numbers.end(),a) == 1 && std::count(letters.begin(),letters.end(),b) == 1)
         {
-            if(current_state[temp]->owner == opponent[owner] || is_king_check)
+            if(current_state.at(temp)->owner == opponent.at(owner)  || is_king_check)
             {
                 attacks.push_back(temp);
                 foreward.push_back(temp);
@@ -372,7 +379,8 @@ std::vector<std::string> ChessPieces::Piece::move_range_pawn(std::map<std::strin
     }
 }
 
-std::vector<std::string> ChessPieces::Piece::move_range_knight(std::map<std::string, Piece *>& current_state, bool is_king_check)
+std::vector<std::string> ChessPieces::Piece::move_range_knight( std::map<std::string, std::shared_ptr<Piece>>const &current_state,
+                                                                bool is_king_check)
 {
 
     static const std::string letters{"abcdefghABCDEFGH"};
@@ -390,7 +398,7 @@ std::vector<std::string> ChessPieces::Piece::move_range_knight(std::map<std::str
                 std::count(letters.begin(), letters.end(), b) == 1) {
                 temp[0] = a;
                 temp[1] = b;
-                if (current_state[temp]->owner != owner) {
+                if (current_state.at(temp)->owner != owner) {
                     potential_moves.push_back(temp);
                 }
             }
@@ -401,7 +409,7 @@ std::vector<std::string> ChessPieces::Piece::move_range_knight(std::map<std::str
                 std::count(letters.begin(), letters.end(), b) == 1) {
                 temp[0] = a;
                 temp[1] = b;
-                if (current_state[temp]->owner != owner) {
+                if (current_state.at(temp)->owner != owner) {
                     potential_moves.push_back(temp);
                 }
             }
@@ -413,7 +421,7 @@ std::vector<std::string> ChessPieces::Piece::move_range_knight(std::map<std::str
                 std::count(letters.begin(), letters.end(), b) == 1) {
                 temp[0] = a;
                 temp[1] = b;
-                if (current_state[temp]->owner != owner) {
+                if (current_state.at(temp)->owner != owner) {
                     potential_moves.push_back(temp);
                 }
             }
@@ -424,7 +432,7 @@ std::vector<std::string> ChessPieces::Piece::move_range_knight(std::map<std::str
                 std::count(letters.begin(), letters.end(), b) == 1) {
                 temp[0] = a;
                 temp[1] = b;
-                if (current_state[temp]->owner != owner) {
+                if (current_state.at(temp)->owner != owner) {
                     potential_moves.push_back(temp);
                 }
             }
@@ -433,10 +441,8 @@ std::vector<std::string> ChessPieces::Piece::move_range_knight(std::map<std::str
     return potential_moves;
 }
 
-void ChessPieces::Piece::update_positions(std::map<std::string, Piece> current_state) {
-    rng_val = get_rng_val();
-}
 
+# TODO update this
 std::string ChessPieces::Piece::get_position(std::map<std::string, Piece *> &current_state) {
     for (auto &space :current_state)
     {
@@ -444,6 +450,8 @@ std::string ChessPieces::Piece::get_position(std::map<std::string, Piece *> &cur
             return space.first;
     }
     return "not found";
+}
+
 }
 
 

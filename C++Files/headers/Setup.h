@@ -6,6 +6,7 @@
 #include <string>
 #include <map>
 #include <vector>
+#include <memory>
 #include "ChessPieces.h"
 #ifndef PROJ1_SETUP_H
 #define PROJ1_SETUP_H
@@ -15,11 +16,11 @@ class Setup {
 public:
     std::string path;
     std::ifstream stream;
-    std::map<std::string,ChessPieces::Piece *> board{};
+    std::map<std::string,std::shared_ptr<ChessPieces::Piece>> board{};
     Setup();
 
 };
 
-ChessPieces::Piece* get_piece(std::string piece, std::string position, std::string owner);
+std::shared_ptr<ChessPieces::Piece> get_piece(std::string piece, std::string position, std::string owner);
 
 #endif //PROJ1_SETUP_H

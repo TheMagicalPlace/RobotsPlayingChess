@@ -5,11 +5,22 @@
 #include "../headers/Setup.h"
 #include "../headers/ChessPieces.h"
 #include <printf.h>
+#include <memory>
+#include <utility>
+#include <vector>
+#include <iostream>
+#include <signal.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <iterator>
+#include <bits/shared_ptr.h>
+
 using namespace std;
 
-ChessPieces::Piece * get_piece(string piece,string position,string owner)
+std::shared_ptr<ChessPieces::Piece> get_piece(string piece,string position,string owner)
 {
-    return new ChessPieces::Piece(owner,piece,position);
+    return std::make_shared<ChessPieces::Piece> (owner,piece,position);
 
 
 }
@@ -30,8 +41,8 @@ Setup::Setup() {
             break;
         std::cout<<pos<< "-"<<piece<<"-"<<owner<<"|";
         piece_string_conversion(pos);
-        ChessPieces::Piece* pce = get_piece(piece, pos, owner);
-        board.insert(pair<string,ChessPieces::Piece*>(pos,pce));
+        std::shared_ptr<ChessPieces::Piece> pce = get_piece(piece, pos, owner);
+        board.insert(pair<string,std::shared_ptr<ChessPieces::Piece>>(pos,pce));
 
 
     }
