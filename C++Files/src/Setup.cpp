@@ -35,7 +35,7 @@ Setup::Setup() {
             break;
         std::cout<<pos<< "-"<<piece<<"-"<<owner<<"|";
         piece_string_conversion(pos);
-        std::shared_ptr<ChessPieces::Piece> pce = std::make_shared<ChessPieces::Piece>(owner, pos, piece);
+        std::shared_ptr<ChessPieces::Piece> pce = std::make_shared<ChessPieces::Piece>(owner,pos,piece);
         board.insert(pair<string,std::shared_ptr<ChessPieces::Piece>>(pos,pce));
 
 

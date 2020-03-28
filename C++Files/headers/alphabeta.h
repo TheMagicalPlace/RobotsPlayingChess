@@ -39,22 +39,29 @@ public:
 
     const std::map<string,std::shared_ptr<ChessPieces::Piece>> board;
 
-    ChessNode(std::shared_ptr<ChessNode> const &prnt,int depth,std::map<string,std::shared_ptr<ChessPieces::Piece>> const &board )
-    :parent(prnt),depth(depth),board(board),exit_piece(std::make_unique<Piece>("EXIT","EXIT","EXIT"))
+    ChessNode(int depth,std::map<string,std::shared_ptr<ChessPieces::Piece>> const &board )
+    :depth(depth),board(board),exit_piece(std::make_shared<Piece>("EXIT","EXIT","EXIT"))
     {
 
         transform(board.begin(), board.end(), back_inserter(board_iter), [](const std::map<string,std::shared_ptr<ChessPieces::Piece>>::value_type& val){return val.second;} );
 
     };
-    std::shared_ptr<ChessNode> spawn_child(std::shared_ptr<Piece> const &piece,string move);
+
+    virtual ~ChessNode(){
+        board_iter.clear();
+        childs.clear();
+        board_iter.clear();
+    };
+
+    std::shared_ptr<ChessNode> spawn_child(std::shared_ptr<Piece> const &piece, string move);
     std::shared_ptr<Piece> next_piece();
 
     void set_value(double val){value=val;};
     double get_value(){ return value;};
 
 private:
-    const std::shared_ptr<ChessNode> parent;
-    const std::shared_ptr<ChessNode> this_ptr{this};
+    //const std::shared_ptr<ChessNode> parent;
+    //std::unique_ptr<ChessNode> this_ptr= std::unique_ptr<ChessNode>(this) ;
     const int depth;
     const std::shared_ptr<Piece> exit_piece;
     double value{0};
@@ -74,19 +81,25 @@ public:
     AlphaBeta(string player, std::map<string, std::shared_ptr<ChessPieces::Piece>> const board, int dpth, bool testing)
         :player{std::move(player)},
         testing{testing},
-        root_node{std::make_shared<ChessNode>(nullptr ,dpth,board)},
+        board(board),
         search_depth{dpth}
     {
+
+    };
+    virtual ~AlphaBeta()
+    {
+
 
     };
     double call(bool maxing_player);
 
 private:
-
+    const std::map<string, std::shared_ptr<ChessPieces::Piece>> board;
     const bool testing;
     const int search_depth;
     const string player;
-    const std::shared_ptr<ChessNode> root_node;
+    const std::shared_ptr<ChessNode> root_node {std::make_shared<ChessNode>(search_depth,board)};
+
 
     std::vector<std::shared_ptr<ChessNode>> child_node_finder(std::shared_ptr<ChessNode> const &node, int depth, bool is_maxing) const;
     double node_evaluation_heuristic(std::shared_ptr<ChessNode> const &node, bool is_maxing);

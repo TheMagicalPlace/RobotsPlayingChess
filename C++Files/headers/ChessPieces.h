@@ -33,10 +33,14 @@ namespace ChessPieces {
         const std::string owner;
         std::string position;
         const std::string piece;
-        const int value = ChessPieces::Piece::piece_values.at(piece);
+        int value;
 
         Piece(std::string owner, std::string position, std::string piece)
-        :owner(owner),piece(piece),position(position){};
+        :owner(owner),position(position),piece(piece)
+        {
+            value = ChessPieces::Piece::piece_values.at(piece);
+
+        };
 
         std::vector<std::string> move_range(std::map<std::string, std::shared_ptr<Piece>> const & board, bool is_king_check);
         std::vector<std::string> move_range_pawn(std::map<std::string, std::shared_ptr<Piece>> const & current_state, bool is_king_check);

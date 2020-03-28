@@ -24,10 +24,10 @@ std::shared_ptr<ChessNode> ChessNode::spawn_child(std::shared_ptr<Piece> const &
     // get old piece position and reassign to new blank for child board and move piece to new position
     string old = piece->position;
     nboard[move] = piece;
-    nboard[old] = std::make_shared<Piece>("None","na",old);
+    nboard[old] = std::make_shared<Piece>("None",old,"na");
 
     // create new node & assign pointer
-    auto new_node= std::make_shared<ChessNode>(this_ptr, this->depth - 1, nboard);
+    auto new_node= std::make_shared<ChessNode>(this->depth - 1, nboard);
 
     childs.push_back(new_node);
     return new_node;
