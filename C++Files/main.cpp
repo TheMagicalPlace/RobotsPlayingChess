@@ -15,15 +15,23 @@ double TestsB(std::map<std::string,std::shared_ptr<ChessPieces::Piece>> setup);
 
 
 int main() {
-
-
+    string hold{};
+    string t{};
     string line = { " " };
     ifstream file1;
     file1.open("/home/themagicalplace/CLionProjects/RobotsPlayingChess/text1.txt");
+    while(!file1.eof())
+    {
 
-    Setup s {};
-    std::map<std::string,std::shared_ptr<ChessPieces::Piece>> i;i.insert(s.board.begin(),s.board.end());
-    TestsA(std::move(s.board));
+        file1>>hold;
+        t.append(hold);
+        t.append(" ");
+        hold.clear();
+    }
+
+    auto board = setup(t);
+    std::map<std::string,std::shared_ptr<ChessPieces::Piece>> i;i.insert(board.begin(),board.end());
+    TestsA(std::move(board));
     TestsB(i);
     return 0;
 };
@@ -75,10 +83,8 @@ void TestSizes(){
     std::cout<<"Size of 'Piece' :"<<sizeof(Piece)<<endl;
     std::cout<<"Size of 'Chess Node' :"<<sizeof(ChessNode)<<endl;
     std::cout<<"Size of 'AB object' :"<<sizeof(AlphaBeta)<<endl;
-    std::cout<<"Size of 'Setup' :"<<sizeof(Setup)<<endl;
     std::cout<<"Size of '*Piece' :"<<sizeof(std::__shared_ptr<Piece>)<<endl;
     std::cout<<"Size of 'instanced Piece' :"<<sizeof(ChessPieces::Piece("White","4a","Bsp"))<<endl;
-    std::cout<<"Size of 'instanced Setup' :"<<sizeof(Setup {})<<endl;
     std::cout<<"Size of '*Piece' :"<<sizeof(std::__shared_ptr<Piece>)<<endl;
     std::cout<<"Size of 'map' :"<<sizeof(std::map<string,std::shared_ptr<ChessPieces::Piece>>)<<endl;
 

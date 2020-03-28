@@ -4,39 +4,34 @@
 
 #include "../headers/Setup.h"
 #include "../headers/ChessPieces.h"
-#include <printf.h>
+
 #include <memory>
 #include <utility>
-#include <vector>
 #include <iostream>
-#include <signal.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <iterator>
 #include <bits/shared_ptr.h>
 
-using namespace std;
+using istringstream = std::istringstream;
+using string = std::string;
 
 
-Setup::Setup() {
-    ifstream file1;
-    file1.open("/home/themagicalplace/CLionProjects/RobotsPlayingChess/text1.txt");
+std::map<std::string,std::shared_ptr<ChessPieces::Piece>> setup(std::string &boards) {
+    std::map<std::string,std::shared_ptr<ChessPieces::Piece>> board{};
+    istringstream boardstream{boards};
 
 
 
-    while (!file1.eof()) {
+    while (!boardstream.eof()) {
         string pos;
         string piece;
         string owner;
 
-        file1 >> pos;file1 >> piece; file1 >> owner;
+        boardstream >> pos;boardstream >> piece; boardstream >> owner;
         if(pos.empty() || piece.empty() || owner.empty())
             break;
         std::cout<<pos<< "-"<<piece<<"-"<<owner<<"|";
         piece_string_conversion(pos);
         std::shared_ptr<ChessPieces::Piece> pce = std::make_shared<ChessPieces::Piece>(owner,pos,piece);
-        board.insert(pair<string,std::shared_ptr<ChessPieces::Piece>>(pos,pce));
+        board.insert(std::pair<string,std::shared_ptr<ChessPieces::Piece>>(pos,pce));
 
 
     }
@@ -48,6 +43,8 @@ Setup::Setup() {
         auto h = *elem.second;
         std::cout << elem.first  << " " << h.position <<" " <<h.owner << "\n";
     }
+
+    return board;
 
 
 

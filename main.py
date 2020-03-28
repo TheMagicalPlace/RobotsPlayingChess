@@ -2,9 +2,11 @@
 from multiprocessing import freeze_support,Pool,set_start_method
 import time
 import functools
-from ChessAI_semirandom import *
-from ChessAI_alphabeta import  *
-from ChessBoard import *
+
+
+from PythonFiles.ChessAI_alphabeta import MultiprocessAB
+from PythonFiles.ChessAI_semirandom import RandomAI
+from PythonFiles.ChessBoard import Chessgame
 
 
 if __name__ == '__main__':
@@ -22,7 +24,7 @@ if __name__ == '__main__':
 
 
     #Loops through n number of games while tracking and printing win counts
-    for i in range(0,1000):
+    for i in range(0,0):
 
         t0 = time.time()
         game = Chessgame() # creates a new game

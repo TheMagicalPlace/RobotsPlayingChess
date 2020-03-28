@@ -132,7 +132,7 @@ double AlphaBeta::node_evaluation_heuristic(std::shared_ptr<ChessNode> const &no
 double AlphaBeta::ab_search(std::shared_ptr<ChessNode> const &node, int depth, bool maxing_player, int alpha, int beta) {
 
     // for debugging odd scores or exits
-    if (depth > (int)search_depth/2)
+    if (depth > 100)
     {
         for(int i{depth};i<search_depth;++i)
             std::cout<<"  ";
@@ -192,7 +192,7 @@ double AlphaBeta::ab_search(std::shared_ptr<ChessNode> const &node, int depth, b
     }
 
     // for debugging odd scores or exits
-    if (depth > 1)
+    if (depth > 100)
     {
         for(int i{depth};i<search_depth;++i)
             std::cout<<"  ";
