@@ -14,7 +14,10 @@
 #include <cmath>
 #include <ctime>
 #include <memory>
-
+#include <algorithm>
+#include <utility>
+#include <iso646.h>
+#include <ios>
 #ifndef PROJ1_CHESSPIECES_H
 #define PROJ1_CHESSPIECES_H
 

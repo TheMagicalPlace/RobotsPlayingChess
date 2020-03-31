@@ -5,9 +5,7 @@
 
 
 
-#include <algorithm>
-#include <utility>
-#include <memory>
+
 #include "../headers/ChessPieces.h"
 
 // Parent 'Piece' Methods
@@ -252,7 +250,7 @@ std::vector<std::string> ChessPieces::Piece::move_range(std::map<string, std::sh
 
 
     return std::vector<std::string>();
-}
+};
 
 std::vector<std::string> ChessPieces::Piece::move_range_pawn(std::map<std::string, std::shared_ptr<Piece>> const & current_state, bool is_king_check)
 {
@@ -376,7 +374,7 @@ std::vector<std::string> ChessPieces::Piece::move_range_pawn(std::map<std::strin
     else{
         return foreward;
     }
-}
+};
 
 std::vector<std::string> ChessPieces::Piece::move_range_knight( std::map<std::string, std::shared_ptr<Piece>>const &current_state,
                                                                 bool is_king_check)
@@ -438,7 +436,7 @@ std::vector<std::string> ChessPieces::Piece::move_range_knight( std::map<std::st
         }
     }
     return potential_moves;
-}
+};
 
 
 // TODO update this
@@ -449,7 +447,7 @@ std::string ChessPieces::Piece::get_position(std::map<std::string,std::shared_pt
             return space.first;
     }
     return "not found";
-}
+};
 
 
 

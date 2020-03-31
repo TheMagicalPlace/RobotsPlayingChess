@@ -12,17 +12,18 @@
 #include <iostream>
 #include <string>
 #include <map>
-#include <vector>
 #include <iterator>
 #include <csignal>
-#include "ChessPieces.h"
 #include <cstdlib>
-#include <map>
-#include <string>
 #include <algorithm>
-#include <iterator>
 #include <vector>
-#include <iostream>
+#include <utility>
+
+#include "ChessPieces.h"
+
+#include <iso646.h>
+
+
 template<class T>
 class Alloc { };
 template<class T>

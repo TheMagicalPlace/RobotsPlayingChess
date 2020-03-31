@@ -3,14 +3,7 @@
 //
 
 #include "../headers/alphabeta.h"
-#include <utility>
-#include <vector>
-#include <iostream>
-#include <signal.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <iterator>
+
 
 
 
@@ -202,10 +195,10 @@ double AlphaBeta::ab_search(std::shared_ptr<ChessNode> const &node, int depth, b
     //  set node value & return
     node->set_value(value);
     return value;
-}
+};
 
 double AlphaBeta::call(bool maxing_player) {
     std::cout<<"initializing call";
     double result = ab_search(root_node,search_depth,maxing_player,-100000,100000);
     return result;
-}
+};

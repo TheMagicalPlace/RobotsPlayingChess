@@ -1,13 +1,19 @@
 //
 // Created by themagicalplace on 3/19/20.
 //
+
+#include <memory>
+#include <utility>
 #include <iostream>
 #include <fstream>
 #include <string>
 #include <map>
 #include <vector>
 #include <memory>
+#include <ios>
+#include <iso646.h>
 #include "ChessPieces.h"
+#include <sstream>
 #ifndef PROJ1_SETUP_H
 #define PROJ1_SETUP_H
 

@@ -3,20 +3,17 @@
 //
 
 #include "../headers/Setup.h"
-#include "../headers/ChessPieces.h"
 
-#include <memory>
-#include <utility>
-#include <iostream>
-#include <bits/shared_ptr.h>
 
-using istringstream = std::istringstream;
+
+
+
 using string = std::string;
 
 
 std::map<std::string,std::shared_ptr<ChessPieces::Piece>> setup(std::string &boards) {
     std::map<std::string,std::shared_ptr<ChessPieces::Piece>> board{};
-    istringstream boardstream{boards};
+    std::istringstream boardstream {boards};
 
 
 
