@@ -9,7 +9,7 @@ from PythonFiles.ChessPieces import *
 from colorama import Fore, Back, Style
 import time
 import os
-import pythonCPPinterop
+
 
 class Chessgame:
     Names = ['Rook', 'Knight', 'Bishop',
@@ -29,16 +29,8 @@ class Chessgame:
         self.king_check = {'Black': [], 'White': []}
         self.turn_count = 0
         self.testing_holdback = []
-        self._convert_to_string()
-    def _convert_to_string(self):
 
-            str = ""
-            for k,v in self._current_state_raw.items():
-                pos = k + ' '
-                piece = v.piece + ' '
-                owner = v.owner + ' '
-                str +=pos+piece+owner+' '
-            return str
+
 
     def determine_checkmate(self,player):
         """checking if the player is in checkmate"""

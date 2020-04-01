@@ -25,7 +25,7 @@ std::map<std::string,std::shared_ptr<ChessPieces::Piece>> setup(std::string &boa
         boardstream >> pos;boardstream >> piece; boardstream >> owner;
         if(pos.empty() || piece.empty() || owner.empty())
             break;
-        std::cout<<pos<< "-"<<piece<<"-"<<owner<<"|";
+        //std::cout<<pos<< "-"<<piece<<"-"<<owner<<"|";
         piece_string_conversion(pos);
         std::shared_ptr<ChessPieces::Piece> pce = std::make_shared<ChessPieces::Piece>(owner,pos,piece);
         board.insert(std::pair<string,std::shared_ptr<ChessPieces::Piece>>(pos,pce));
@@ -33,13 +33,13 @@ std::map<std::string,std::shared_ptr<ChessPieces::Piece>> setup(std::string &boa
 
     }
     auto a = *board.begin()->second;
-    std::cout<<"first "<<a.position;
+    //std::cout<<"first "<<a.position;
 
-    for(const auto& elem :  board)
-    {
-        auto h = *elem.second;
-        std::cout << elem.first  << " " << h.position <<" " <<h.owner << "\n";
-    }
+    //for(const auto& elem :  board)
+    //{
+    //    auto h = *elem.second;
+    //    std::cout << elem.first  << " " << h.position <<" " <<h.owner << "\n";
+    //}
 
     return board;
 

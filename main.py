@@ -2,14 +2,21 @@
 from multiprocessing import freeze_support,Pool,set_start_method
 import time
 import functools
+import sys,os
 
-
+# including C++ module for alpha-beta search
+sys.path.append(os.path.join(os.getcwd(),'build_files','build','lib.win-amd64-3.8'));
+print(sys.path)
 from PythonFiles.ChessAI_alphabeta import MultiprocessAB
 from PythonFiles.ChessAI_semirandom import RandomAI
 from PythonFiles.ChessBoard import Chessgame
 
 
 if __name__ == '__main__':
+
+    # including C++ module for alpha-beta search
+    # TODO this needs to be changed for linux
+    sys.path.append('build_files/build/lib.win-amd64-3.8/')
 
     # setting up multiprocessing conditions
     freeze_support()

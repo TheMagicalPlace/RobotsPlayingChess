@@ -1,3 +1,13 @@
+from pathlib import Path
+
+if __name__ == '__main__':
+    import time
+    import sys, os
+
+    # TODO this needs to be changed for linux
+    sys.path.append(os.path.join(Path(os.getcwd()).parent,'build_files','build','lib.win-amd64-3.8'));
+
+import pythonCPPinterop as PCPPI
 import copy
 from collections import defaultdict
 from PythonFiles.ChessBoard import Chessgame
@@ -6,6 +16,7 @@ from PythonFiles.ChessPieces import *
 from multiprocessing import Queue,Pool
 from queue import Queue
 from typing import Dict,Tuple
+
 
 class vars:
     """class that holds the depth of the MinMax search (i.e. how many rounds to look ahead) for easy adjustment"""
@@ -18,6 +29,11 @@ def child_process(node,player,depth):
     abspawn = AlphaBeta(player)
     return abspawn.call_multiprocess(node,maxing=False,depth=depth)
 
+def child_process_cpp(node,player,depth):
+    board_string = node.convert_to_string();
+    value = PCPPI.PythonCPPRunAlphabeta(board_string,depth,player)
+    node.value = value
+    return node
 
 class ChessNode():
     """info container for each node in the MinMax tree with the 'board value' (how desirable a board state is)
@@ -30,6 +46,16 @@ class ChessNode():
         self.board = board
         self.index = 0
         self.children = None
+
+    def convert_to_string(self):
+
+        str = ""
+        for k,v in self.board.items():
+            pos = k + ' '
+            piece = v.piece + ' '
+            owner = v.owner + ' '
+            str +=pos+piece+owner+' '
+        return str
 
     # Comparison operators for alpha-beta pruning and finding min/max vals
     def __ge__(self, other):
@@ -85,10 +111,20 @@ class AlphaBeta(ChessTurnABC,Chessgame):
         return optimal_node.parent
 
 
+
     def __call__(self,root : Dict[str,Piece],depth : int =vars.depth,maxing=True):
 
         self.root_node = ChessNode(depth,board=root) # creates the initial node, representing the current game state
         self.alphabeta(self.root_node,depth,maxing,-100000,100000)
+        self._current_state_raw = max([child for child in self.root_node.children if child.value is not None]).board
+        return self._current_state_raw
+
+    def call_cpp(self,root : Dict[str,Piece],depth : int =vars.depth,maxing=True):
+        self.root_node = ChessNode(depth,board=root) # creates the initial node, representing the current game state
+        childs = self.child_node_finder(self.root_node,depth,True)
+        self.root_node.children = childs
+        for child in childs:
+            child.value = PCPPI.PythonCPPRunAlphabeta(child.convert_to_string(),depth-1,self.player)
         self._current_state_raw = max([child for child in self.root_node.children if child.value is not None]).board
         return self._current_state_raw
 
@@ -194,26 +230,48 @@ class MultiprocessAB(AlphaBeta):
 
 
     def __call__(self):
-
+        """ Executes a multiprocess Alpha-Beta minmax search via a custom C++ implementation of the search algorithm"""
         with Pool(5) as p:
-            data = p.starmap(child_process, [(child,self.player,self.depth-2) for child in self.mp_childs]) # runs an instance of AlphaBeta for each child node
+            data = p.starmap(child_process_cpp, [(child,self.player,self.depth-2) for child in self.mp_childs]) # runs an instance of AlphaBeta for each child node
         self._current_state_raw=max(data).board
 
+    def call_python(self):
+        """Legacy - for testing only"""
+        with Pool(5) as p:
+            data = p.starmap(child_process, [(child,self.player,self.depth-2) for child in self.mp_childs]) # runs an instance of AlphaBeta for each child node
+            self._current_state_raw=max(data).board
 
 if __name__ == '__main__':
     import time
-
+    import sys, os
+    sys.path.append(os.path.join(os.getcwd(),'build_files','build','lib.win-amd64-3.8'));
     t = Chessgame()
     initial = time.time()
-    for i in range(4,6):
-        t0  = time.time()
+
+
+    for i in range(4,8):
+
         a = MultiprocessAB('Black',t._current_state_raw,depth=i)
+        t0  = time.time()
         a()
-        print(time.time() - t0)
-        t0 = time.time()
+        print(f'Run Time at depth {i} using multiprocessing and C++ : {time.time() - t0:08f}\n')
+
+
+        a = MultiprocessAB('Black',t._current_state_raw,depth=i)
+        t0  = time.time()
+        a.call_python()
+        print(f'Run Time at depth {i} using multiprocessing and Python Search : {time.time() - t0:08f}\n')
+
+
         a = AlphaBeta('Black')
-        yepis = a(t._current_state_raw,i,True)
-        a.get_current_state(a._current_state_raw)
-        elapsed = time.time() - t0
-        total = time.time()-initial
-        print(f'depth: {i} run-time: {elapsed} total time : {total}')
+        t0  = time.time()
+        a.call_cpp(t._current_state_raw,i,True)
+        print(f'Run Time at depth {i} using single process and C++ : {time.time() - t0:08f}\n')
+
+
+        #a = AlphaBeta('Black')
+        #t0  = time.time()
+        #a(t._current_state_raw,i,True)
+        #print(f'Run Time at depth {i} using single process and Python Search : {time.time() - t0:08f}\n')
+
+
